@@ -6,33 +6,31 @@ import Divider from "../components/Divider.astro";
 import SoundCloud from "../components/SoundCloud.astro";
 import TrackBrowser from "../components/TrackBrowser.astro";
 import Icon from "../components/Icon.astro";
+// All copy, photos and dates are edited from /admin (files in src/data).
+import site from "../data/site.json";
+import gigData from "../data/gigs.json";
 
-const gigs = [
-  ["SEPTEMBER 2026", "Irgendwo", "BREMEN"],
-  ["SEPTEMBER 2026", "Irgendwo", "BREMEN"],
-  ["JUNE 2026", "PA.RA", "BREMEN"],
-];
+const { hero, sound, about, live } = site;
+const { mix } = sound;
+const gigs = gigData.gigs;
 ---
-<Base
-  title="Nahawandi — Electronic Music · DJ"
-  description="Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture."
->
+<Base title={site.seoTitle} description={site.seoDescription}>
   <!-- ───── Hero ───── -->
   <section class="hero">
     <div class="wrap">
       <div class="hero-meta reveal-fade">
-        <span class="side"><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">ELECTRONIC MUSIC · DJ</span></span>
+        <span class="side"><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">{hero.tagLeft}</span></span>
         <span class="centre">
           <Ornament kind="star" size={14} opacity={0.7} />
           <ArabicWordmark width={106} />
           <Ornament kind="star" size={14} opacity={0.7} />
         </span>
-        <span class="side"><span class="label">AMMAN / BREMEN</span><Ornament kind="dot" size={8} opacity={0.7} /></span>
+        <span class="side"><span class="label">{hero.tagRight}</span><Ornament kind="dot" size={8} opacity={0.7} /></span>
       </div>
 
       <div class="hero-visual">
         <div class="hero-photo reveal">
-          <img src="/images/hero.jpg" alt="Nahawandi" fetchpriority="high" />
+          <img src={hero.image} alt="Nahawandi" fetchpriority="high" />
           <span class="inner-arch"></span>
         </div>
         <div class="hero-stars" aria-hidden="true">
@@ -46,11 +44,9 @@ const gigs = [
       </div>
 
       <div class="hero-bottom">
-        <p class="hero-copy muted reveal" style="--d:.2s">
-          Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.
-        </p>
+        <p class="hero-copy muted reveal" style="--d:.2s">{hero.copy}</p>
         <div class="hero-cta reveal" style="--d:.35s">
-          <a class="enter" href="#sound"><span class="play-circle"><Icon name="play" size={18} /></span>ENTER THE SOUND ARCHIVE</a>
+          <a class="enter" href="#sound"><span class="play-circle"><Icon name="play" size={18} /></span>{hero.cta}</a>
           <span class="label muted float scroll-hint">SCROLL <Icon name="arrow-down" size={12} /></span>
         </div>
       </div>
@@ -74,9 +70,9 @@ const gigs = [
           <Ornament kind="dot" size={8} opacity={0.7} />
           <Ornament kind="dot" size={5} opacity={0.4} />
         </div>
-        <span class="arabic reveal" style="--d:.05s">الأرشيف</span>
-        <h2 class="words">The Sound Archive</h2>
-        <p class="reveal" style="--d:.25s">Different sounds, one perspective. Three chapters, twenty-one tracks.</p>
+        <span class="arabic reveal" style="--d:.05s">{sound.arabic}</span>
+        <h2 class="words">{sound.heading}</h2>
+        <p class="reveal" style="--d:.25s">{sound.intro}</p>
       </div>
 
       <article class="mix reveal">
@@ -84,14 +80,14 @@ const gigs = [
         <Ornament kind="star" size={14} opacity={0.6} class="corner tr" />
         <Ornament kind="star" size={14} opacity={0.6} class="corner bl" />
         <Ornament kind="star" size={14} opacity={0.6} class="corner br" />
-        <div class="mix-image"><img src="/images/mix.jpg" alt="Live at Irgendwo" loading="lazy" /></div>
+        <div class="mix-image"><img src={mix.image} alt={mix.title} loading="lazy" /></div>
         <div class="mix-details">
-          <span class="eyebrow"><Ornament kind="dot" size={10} /><span class="label">FEATURED MIX · FOR BOOKERS</span></span>
-          <h3>Live at Irgendwo</h3>
-          <span class="label muted">DJ SET · BREMEN · SEPTEMBER 2026</span>
-          <p class="lede">The overall sound in one recording, from groove to late-night hypnotic.</p>
-          <div class="player-frame"><SoundCloud url="https://soundcloud.com/nahawandi/irgendwo" /></div>
-          <span class="label muted">19 TRACKS · SOUNDCLOUD</span>
+          <span class="eyebrow"><Ornament kind="dot" size={10} /><span class="label">{mix.eyebrow}</span></span>
+          <h3>{mix.title}</h3>
+          <span class="label muted">{mix.meta}</span>
+          <p class="lede">{mix.lede}</p>
+          <div class="player-frame"><SoundCloud url={mix.soundcloud} /></div>
+          <span class="label muted">{mix.footnote}</span>
         </div>
       </article>
 
@@ -107,13 +103,13 @@ const gigs = [
       <div class="about-split">
         <div class="about-photo-col reveal">
           <div class="arch-photo">
-            <img src="/images/about.jpg" alt="Qais — Nahawandi" loading="lazy" />
+            <img src={about.image} alt="Qais — Nahawandi" loading="lazy" />
             <span class="inner-arch"></span>
           </div>
           <div class="caption">
-            <span class="label">QAIS / NAHAWANDI</span>
+            <span class="label">{about.captionLeft}</span>
             <Ornament kind="star" size={13} opacity={0.6} />
-            <span class="label">BREMEN, 2026</span>
+            <span class="label">{about.captionRight}</span>
           </div>
         </div>
         <div class="about-copy-col">
@@ -130,14 +126,10 @@ const gigs = [
             </div>
           </div>
           <div class="about-copy">
-            <h2 class="words">Bringing culture and context into the club.</h2>
-            <p class="story reveal" style="--d:.1s">
-              Rooted between Amman and Bremen, Nahawandi builds danceable electronic grooves around cultural moments, rhythmic systems, voices and fragments drawn from different worlds—reworking them into high-energy electronic frameworks with unexpected twists.
-            </p>
-            <p class="maqam reveal" style="--d:.2s">
-              Derived from the Arabic maqam Nahawand, the name Nahawandi reflects his commitment to bringing new melodic perspectives to contemporary electronic music.
-            </p>
-            <a class="link-line reveal" style="--d:.3s" href="/biography/">READ FULL BIOGRAPHY</a>
+            <h2 class="words">{about.heading}</h2>
+            <p class="story reveal" style="--d:.1s">{about.story}</p>
+            <p class="maqam reveal" style="--d:.2s">{about.maqam}</p>
+            <a class="link-line reveal" style="--d:.3s" href="/biography/">{about.linkLabel}</a>
           </div>
         </div>
       </div>
@@ -151,14 +143,14 @@ const gigs = [
     <div class="wrap">
       <span class="bg-star" aria-hidden="true"><Ornament kind="star" size={70} opacity={0.12} class="spin-slow" /></span>
       <div class="archive-head">
-        <h2 class="display words">Live</h2>
+        <h2 class="display words">{live.heading}</h2>
         <div class="right reveal-fade">
-          <span class="arabic">الحفلات</span>
+          <span class="arabic">{live.arabic}</span>
           <Ornament kind="star" size={13} opacity={0.6} />
-          <span class="label">DATES &amp; BOOKINGS</span>
+          <span class="label">{live.label}</span>
         </div>
       </div>
-      {gigs.map(([date, name, place], i) => (
+      {gigs.map(({ date, name, place }, i) => (
         <div class="gig reveal" style={`--d:${i * 0.08}s`}>
           <span class="date">{date}</span>
           <span class="name">{name}</span>
@@ -166,8 +158,8 @@ const gigs = [
         </div>
       ))}
       <div class="live-cta reveal" style="--d:.2s">
-        <p class="muted">Bringing the sound to your night, club or festival?</p>
-        <a class="link-line" href="#contact">BOOK A SET</a>
+        <p class="muted">{live.ctaText}</p>
+        <a class="link-line" href="#contact">{live.ctaLabel}</a>
       </div>
     </div>
   </section>

@@ -35,7 +35,9 @@ const counts = Object.fromEntries(
         <div class="track-body">
           <div>
             <div class="track-details">
-              <div class="artwork"><span>ARTWORK PLACEHOLDER</span></div>
+              {t.artwork
+                ? <div class="artwork" style={`background-image:url(${t.artwork})`}></div>
+                : <div class="artwork"><span>ARTWORK PLACEHOLDER</span></div>}
               <div class="track-info">
                 <p class="desc">{t.description}</p>
                 <SoundCloud url={t.soundcloud} start={t.start} lazy />

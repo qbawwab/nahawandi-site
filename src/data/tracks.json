@@ -1,0 +1,271 @@
+{
+  "tracks": [
+    {
+      "title": "Mawwal",
+      "source": "RELEASE",
+      "duration": "SINGLE",
+      "categories": [
+        "hypnotic"
+      ],
+      "description": "Single release by Nahawandi.",
+      "soundcloud": "https://soundcloud.com/nahawandi/mawwal-nahawandi",
+      "spotify": "https://open.spotify.com/track/6B0OfmS3DfAgYmx5vCr9pN",
+      "note": "ALSO ON SPOTIFY"
+    },
+    {
+      "title": "Chant of the Valley",
+      "source": "RELEASE",
+      "duration": "SINGLE",
+      "categories": [
+        "groove"
+      ],
+      "description": "Single release by Nahawandi.",
+      "soundcloud": "https://soundcloud.com/nahawandi/chant-of-the-valley",
+      "spotify": "https://open.spotify.com/track/1WSUC3uOputmsMM2SCnxCt",
+      "note": "ALSO ON SPOTIFY"
+    },
+    {
+      "title": "Al Atrash",
+      "source": "IRGENDWO SET · 01",
+      "duration": "0:00",
+      "categories": [
+        "reimagined"
+      ],
+      "description": "Track 1 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 0:00.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "0:00",
+      "note": "0:00 – 5:15"
+    },
+    {
+      "title": "Chant of the Valley",
+      "source": "IRGENDWO SET · 02",
+      "duration": "5:15",
+      "categories": [
+        "groove"
+      ],
+      "description": "Track 2 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 5:15.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "5:15",
+      "note": "5:15 – 11:00"
+    },
+    {
+      "title": "Law Kan Qalbi",
+      "source": "IRGENDWO SET · 03",
+      "duration": "11:00",
+      "categories": [
+        "groove",
+        "hypnotic",
+        "reimagined"
+      ],
+      "description": "Track 3 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 11:00.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "11:00",
+      "note": "11:00 – 19:38"
+    },
+    {
+      "title": "Cuando Tenga La Tierra (Rework)",
+      "source": "IRGENDWO SET · 04",
+      "duration": "19:38",
+      "categories": [
+        "hypnotic",
+        "reimagined"
+      ],
+      "description": "Track 4 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 19:38.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "19:38",
+      "note": "19:38 – 25:07"
+    },
+    {
+      "title": "Al Bostah (Rework) / Ocean",
+      "source": "IRGENDWO SET · 05",
+      "duration": "25:07",
+      "categories": [
+        "hypnotic",
+        "reimagined"
+      ],
+      "credit": "Fairuz / Moses Yoofee Trio",
+      "description": "Track 5 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 25:07.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "25:07",
+      "note": "25:07 – 33:15"
+    },
+    {
+      "title": "Respect (Groovy Soul Rework)",
+      "source": "IRGENDWO SET · 06",
+      "duration": "33:15",
+      "categories": [
+        "groove",
+        "reimagined"
+      ],
+      "description": "Track 6 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 33:15.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "33:15",
+      "note": "33:15 – 38:30"
+    },
+    {
+      "title": "Careless Whisper (Tension Mix)",
+      "source": "IRGENDWO SET · 07",
+      "duration": "38:30",
+      "categories": [
+        "groove",
+        "hypnotic",
+        "reimagined"
+      ],
+      "description": "Track 7 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 38:30.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "38:30",
+      "note": "38:30 – 45:54"
+    },
+    {
+      "title": "Monyati",
+      "source": "IRGENDWO SET · 08",
+      "duration": "45:54",
+      "categories": [
+        "groove",
+        "hypnotic"
+      ],
+      "description": "Track 8 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 45:54.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "45:54",
+      "note": "45:54 – 51:35"
+    },
+    {
+      "title": "Soulitude",
+      "source": "IRGENDWO SET · 09",
+      "duration": "51:35",
+      "categories": [
+        "groove",
+        "reimagined"
+      ],
+      "description": "Track 9 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 51:35.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "51:35",
+      "note": "51:35 – 56:10"
+    },
+    {
+      "title": "Janoob",
+      "source": "IRGENDWO SET · 10",
+      "duration": "56:10",
+      "categories": [
+        "hypnotic",
+        "reimagined"
+      ],
+      "description": "Track 10 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 56:10.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "56:10",
+      "note": "56:10 – 1:02:23"
+    },
+    {
+      "title": "Suns Of Gold (August Rework)",
+      "source": "IRGENDWO SET · 11",
+      "duration": "1:02:23",
+      "categories": [
+        "groove",
+        "hypnotic",
+        "reimagined"
+      ],
+      "description": "Track 11 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:02:23.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:02:23",
+      "note": "1:02:23 – 1:14:40"
+    },
+    {
+      "title": "Bharat",
+      "source": "IRGENDWO SET · 12",
+      "duration": "1:14:40",
+      "categories": [
+        "groove",
+        "hypnotic"
+      ],
+      "credit": "Parveen Sultana",
+      "description": "Track 12 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:14:40.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:14:40",
+      "note": "1:14:40 – 1:22:05"
+    },
+    {
+      "title": "Der zerstörte Tisch",
+      "source": "IRGENDWO SET · 13",
+      "duration": "1:22:05",
+      "categories": [],
+      "chapter": "NAHAWANDI",
+      "description": "Track 13 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:22:05.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:22:05",
+      "note": "1:22:05 – 1:27:47"
+    },
+    {
+      "title": "Takalam",
+      "source": "IRGENDWO SET · 14",
+      "duration": "1:27:47",
+      "categories": [
+        "hypnotic"
+      ],
+      "description": "Track 14 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:27:47.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:27:47",
+      "note": "1:27:47 – 1:31:25"
+    },
+    {
+      "title": "You've Got To Live",
+      "source": "IRGENDWO SET · 15",
+      "duration": "1:31:25",
+      "categories": [
+        "groove"
+      ],
+      "description": "Track 15 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:31:25.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:31:25",
+      "note": "1:31:25 – 1:35:06"
+    },
+    {
+      "title": "Ones & Zeroes",
+      "source": "IRGENDWO SET · 16",
+      "duration": "1:35:06",
+      "categories": [
+        "groove",
+        "hypnotic"
+      ],
+      "description": "Track 16 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:35:06.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:35:06",
+      "note": "1:35:06 – 1:39:35"
+    },
+    {
+      "title": "Mawwal",
+      "source": "IRGENDWO SET · 17",
+      "duration": "1:39:35",
+      "categories": [
+        "hypnotic"
+      ],
+      "description": "Track 17 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:39:35.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:39:35",
+      "note": "1:39:35 – 1:42:50"
+    },
+    {
+      "title": "ID",
+      "source": "IRGENDWO SET · 18",
+      "duration": "1:42:50",
+      "categories": [
+        "groove"
+      ],
+      "description": "Track 18 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:42:50.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:42:50",
+      "note": "1:42:50 – 1:45:12"
+    },
+    {
+      "title": "Bumba (ID)",
+      "source": "IRGENDWO SET · 19",
+      "duration": "1:45:12",
+      "categories": [
+        "groove"
+      ],
+      "description": "Track 19 of 19 in Live at Irgendwo, Bremen. Press play — it starts at 1:45:12.",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "start": "1:45:12",
+      "note": "1:45:12 – END"
+    }
+  ]
+}

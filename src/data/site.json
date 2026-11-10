@@ -1,0 +1,50 @@
+{
+  "seoTitle": "Nahawandi — Electronic Music · DJ",
+  "seoDescription": "Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.",
+  "hero": {
+    "tagLeft": "ELECTRONIC MUSIC · DJ",
+    "tagRight": "AMMAN / BREMEN",
+    "image": "/images/hero.jpg",
+    "copy": "Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.",
+    "cta": "ENTER THE SOUND ARCHIVE"
+  },
+  "sound": {
+    "arabic": "الأرشيف",
+    "heading": "The Sound Archive",
+    "intro": "Different sounds, one perspective. Three chapters, twenty-one tracks.",
+    "mix": {
+      "eyebrow": "FEATURED MIX · FOR BOOKERS",
+      "title": "Live at Irgendwo",
+      "meta": "DJ SET · BREMEN · SEPTEMBER 2026",
+      "lede": "The overall sound in one recording, from groove to late-night hypnotic.",
+      "image": "/images/mix.jpg",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
+      "footnote": "19 TRACKS · SOUNDCLOUD"
+    }
+  },
+  "about": {
+    "image": "/images/about.jpg",
+    "captionLeft": "QAIS / NAHAWANDI",
+    "captionRight": "BREMEN, 2026",
+    "heading": "Bringing culture and context into the club.",
+    "story": "Rooted between Amman and Bremen, Nahawandi builds danceable electronic grooves around cultural moments, rhythmic systems, voices and fragments drawn from different worlds—reworking them into high-energy electronic frameworks with unexpected twists.",
+    "maqam": "Derived from the Arabic maqam Nahawand, the name Nahawandi reflects his commitment to bringing new melodic perspectives to contemporary electronic music.",
+    "linkLabel": "READ FULL BIOGRAPHY"
+  },
+  "live": {
+    "heading": "Live",
+    "arabic": "الحفلات",
+    "label": "DATES & BOOKINGS",
+    "ctaText": "Bringing the sound to your night, club or festival?",
+    "ctaLabel": "BOOK A SET"
+  },
+  "contact": {
+    "emails": ["booking@nahawandi.com", "info@nahawandi.com"],
+    "links": [
+      { "name": "SoundCloud", "url": "https://soundcloud.com/nahawandi" },
+      { "name": "Instagram", "url": "#" },
+      { "name": "Resident Advisor", "url": "#" }
+    ],
+    "copyright": "© 2026 · NAHAWANDI.COM"
+  }
+}
