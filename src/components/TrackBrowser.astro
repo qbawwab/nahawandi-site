@@ -148,6 +148,9 @@ const counts = Object.fromEntries(
     let current = -1;
     let pendingSeek: number | null = null;
     let seekTries = 0;
+    let loading = false; // a different recording is loading into the mini player
+    let loadToken = 0;
+    let switchedAt = 0;
 
     const markCurrent = (i: number) => {
       current = i;
@@ -164,10 +167,12 @@ const counts = Object.fromEntries(
         frame.appendChild(iframe);
         widget = SC.Widget(iframe);
         widget.bind(SC.Widget.Events.PLAY, () => {
+          if (!active) return widget.pause(); // closed while a track was loading
           window.dispatchEvent(new CustomEvent("nah:play", { detail: MINI }));
-          if (pendingSeek !== null) widget.seekTo(pendingSeek);
+          if (!loading && pendingSeek !== null) widget.seekTo(pendingSeek);
         });
         widget.bind(SC.Widget.Events.PLAY_PROGRESS, (e: any) => {
+          if (loading) return; // these events are still from the previous recording
           // SoundCloud ignores a seek sent too soon after loading: retry until it lands.
           if (pendingSeek !== null) {
             if (Math.abs(e.currentPosition - pendingSeek) < 3000 || ++seekTries > 40) pendingSeek = null;
@@ -178,7 +183,11 @@ const counts = Object.fromEntries(
           const best = trackAt(loadedUrl, e.currentPosition);
           if (best >= 0 && best !== current) markCurrent(best);
         });
-        widget.bind(SC.Widget.Events.FINISH, () => step(1));
+        // Auto-advance only on a genuine end, never in the middle of a switch.
+        widget.bind(SC.Widget.Events.FINISH, () => {
+          if (loading || pendingSeek !== null || Date.now() - switchedAt < 3000) return;
+          step(1);
+        });
       });
 
     /** Play track i in the mini player, from `ms` (defaults to its timestamp). */
@@ -192,6 +201,7 @@ const counts = Object.fromEntries(
       }
       pendingSeek = ms;
       seekTries = 0;
+      switchedAt = Date.now();
       if (!widget) {
         loadedUrl = d.url;
         setup(d.url);
@@ -200,7 +210,19 @@ const counts = Object.fromEntries(
         widget.play();
       } else {
         loadedUrl = d.url;
-        widget.load(d.url, { ...OPTS, auto_play: true });
+        loading = true;
+        const token = ++loadToken; // a newer switch makes older loads irrelevant
+        const done = () => {
+          if (token !== loadToken || !loading || !active) return;
+          loading = false;
+          switchedAt = Date.now();
+          widget.getDuration((total: number) => {
+            if (token === loadToken && pendingSeek !== null && total > 0 && pendingSeek >= total) pendingSeek = null;
+          });
+          widget.play();
+        };
+        widget.load(d.url, { ...OPTS, auto_play: true, callback: done });
+        setTimeout(done, 8000); // in case SoundCloud never confirms the load
       }
     };
 
@@ -218,6 +240,8 @@ const counts = Object.fromEntries(
     mini.querySelector(".mini-close")!.addEventListener("click", () => {
       widget?.pause();
       active = false;
+      loading = false;
+      pendingSeek = null;
       mini.hidden = true;
       root.classList.remove("mini-on");
       markCurrent(-1);
