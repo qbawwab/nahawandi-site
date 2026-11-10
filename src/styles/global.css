@@ -25,6 +25,9 @@ body {
   color: var(--text);
   font-family: var(--garamond);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-variant-emoji: text;
   overflow-x: hidden;
 }
 img { display: block; max-width: 100%; }
@@ -58,6 +61,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .wordmark { font-family: var(--oswald); text-transform: uppercase; line-height: 1; }
 
 .starband { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.icon { display: inline-block; flex: none; vertical-align: -0.1em; }
+.play-circle .icon { margin-left: 3px; }
+.scroll-hint { display: inline-flex; align-items: center; gap: 8px; }
+.more-btn .icon { transition: transform .4s var(--ease); }
+.more-btn.is-open .icon { transform: rotate(180deg); }
+.elsewhere a .icon { vertical-align: 0; opacity: .7; }
+.back { display: inline-flex; align-items: center; gap: 10px; }
 
 /* ───────── Navigation ───────── */
 .nav {
@@ -138,7 +148,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .hero .wrap { padding-top: 32px; padding-bottom: 56px; }
   .hero-meta .side .orn, .hero-meta .centre .orn { display: none; }
   .hero-meta .wordmark-ar { width: 70px; height: 40px; }
-  .hero-meta .label { font-size: 10px; letter-spacing: .12em; white-space: nowrap; }
+  .hero-meta .label { font-size: 11.5px; letter-spacing: .1em; white-space: nowrap; }
   .hero-meta .side:first-child .label { white-space: normal; max-width: 9em; }
   .hero-visual { height: 400px; }
   .hero-photo { width: 100%; height: 330px; top: 30px; }
@@ -270,8 +280,8 @@ sc-player { display: block; }
   .track-head { flex-wrap: wrap; padding: 22px 0; gap: 8px 12px; }
   .track-num { flex: 0 0 auto; }
   .track-title { flex: 1 1 60%; order: 0; font-size: 22px; }
-  .track-meta { order: 3; width: 100%; gap: 16px; flex-wrap: wrap; padding-left: 0; }
-  .track-meta .label { font-size: 11px; }
+  .track-meta { order: 3; width: 100%; gap: 4px 14px; flex-wrap: wrap; padding-left: 0; }
+  .track-meta .label { font-size: 12px; letter-spacing: .12em; }
   .track-head:hover { padding-left: 0; }
   .track-details { flex-direction: column; gap: 24px; padding-bottom: 36px; }
   .artwork { display: none; }
@@ -343,10 +353,12 @@ sc-player { display: block; }
   .archive .wrap { padding-top: 56px; padding-bottom: 64px; }
   .archive-head { flex-direction: column; align-items: flex-start; gap: 10px; padding-bottom: 24px; }
   .archive .bg-star { display: none; }
-  .gig { gap: 12px; padding: 24px 0; }
-  .gig .date { flex: 0 0 92px; font-size: 11px; }
-  .gig .name { font-size: 26px; }
-  .gig .place .label { font-size: 11px; }
+  /* date on its own line above the venue, so nothing gets squeezed */
+  .gig { flex-wrap: wrap; gap: 8px 12px; padding: 24px 0; }
+  .gig:hover { padding-left: 0; }
+  .gig .date { flex: 0 0 100%; font-size: 12px; letter-spacing: .14em; }
+  .gig .name { font-size: 30px; }
+  .gig .place .label { font-size: 12px; letter-spacing: .14em; }
 }
 
 /* ───────── Contact ───────── */

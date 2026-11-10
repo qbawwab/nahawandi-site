@@ -1,6 +1,7 @@
 ---
 import { tracks, chapters, biNum } from "../data/tracks";
 import SoundCloud from "./SoundCloud.astro";
+import Icon from "./Icon.astro";
 
 const VISIBLE = 6; // rows shown before "More tracks"
 const counts = Object.fromEntries(
@@ -41,7 +42,7 @@ const counts = Object.fromEntries(
                 <div class="track-actions">
                   {t.spotify && (
                     <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
-                      <span>♫</span> SPOTIFY
+                      <Icon name="note" size={14} /> SPOTIFY
                     </a>
                   )}
                   {t.note && <span class="label muted">{t.note}</span>}
@@ -56,7 +57,7 @@ const counts = Object.fromEntries(
 
   <div class="more-wrap">
     <button class="btn-outline more-btn" aria-expanded="false">
-      <span class="more-label">MORE TRACKS</span><span class="more-icon">↓</span>
+      <span class="more-label">MORE TRACKS</span><span class="more-icon"><Icon name="arrow-down" size={13} /></span>
     </button>
   </div>
 </div>
@@ -85,7 +86,7 @@ const counts = Object.fromEntries(
       moreWrap.hidden = shown <= visible;
       moreBtn.setAttribute("aria-expanded", String(expanded));
       moreBtn.querySelector(".more-label")!.textContent = expanded ? "FEWER TRACKS" : `MORE TRACKS (${shown - visible})`;
-      moreBtn.querySelector(".more-icon")!.textContent = expanded ? "↑" : "↓";
+      moreBtn.classList.toggle("is-open", expanded);
     };
 
     tabs.forEach((tab) =>

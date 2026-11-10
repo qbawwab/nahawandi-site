@@ -1,6 +1,7 @@
 ---
 import Ornament from "./Ornament.astro";
 import ArabicWordmark from "./ArabicWordmark.astro";
+import Icon from "./Icon.astro";
 // Social links weren't set in Framer yet — fill these in.
 const elsewhere = [
   ["SoundCloud", "https://soundcloud.com/nahawandi"],
@@ -26,7 +27,7 @@ const elsewhere = [
         <span class="label col-label">ELSEWHERE</span>
         <div class="elsewhere">
           {elsewhere.map(([name, href]) => (
-            <a href={href} target="_blank" rel="noopener">{name} ↗</a>
+            <a href={href} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={18} /></a>
           ))}
         </div>
       </div>

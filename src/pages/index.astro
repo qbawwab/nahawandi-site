@@ -5,6 +5,7 @@ import ArabicWordmark from "../components/ArabicWordmark.astro";
 import Divider from "../components/Divider.astro";
 import SoundCloud from "../components/SoundCloud.astro";
 import TrackBrowser from "../components/TrackBrowser.astro";
+import Icon from "../components/Icon.astro";
 
 const gigs = [
   ["SEPTEMBER 2026", "Irgendwo", "BREMEN"],
@@ -49,8 +50,8 @@ const gigs = [
           Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.
         </p>
         <div class="hero-cta reveal" style="--d:.35s">
-          <a class="enter" href="#sound"><span class="play-circle">▶</span>ENTER THE SOUND ARCHIVE</a>
-          <span class="label muted float">SCROLL ↓</span>
+          <a class="enter" href="#sound"><span class="play-circle"><Icon name="play" size={18} /></span>ENTER THE SOUND ARCHIVE</a>
+          <span class="label muted float scroll-hint">SCROLL <Icon name="arrow-down" size={12} /></span>
         </div>
       </div>
     </div>
