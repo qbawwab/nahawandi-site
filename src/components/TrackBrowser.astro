@@ -35,15 +35,10 @@ const counts = Object.fromEntries(
         <div class="track-body">
           <div>
             <div class="track-details">
-              {t.artwork
-                ? <div class="artwork" style={`background-image:url(${t.artwork})`}></div>
-                : <div class="artwork"><span>ARTWORK PLACEHOLDER</span></div>}
+              {t.artwork && <div class="artwork" style={`background-image:url(${t.artwork})`}></div>}
               <div class="track-info">
-                <p class="desc">{t.description}</p>
+                {t.description && <p class="desc">{t.description}</p>}
                 <SoundCloud url={t.soundcloud} start={t.start} title={t.title} lazy />
-                <button type="button" class="btn-line mini-play">
-                  <Icon name="play" size={12} /><span class="mp-go">PLAY IN MINI PLAYER</span><span class="mp-now">NOW PLAYING</span>
-                </button>
                 <div class="track-actions">
                   {t.spotify && (
                     <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
@@ -152,6 +147,7 @@ const counts = Object.fromEntries(
     let loadedUrl = "";
     let current = -1;
     let pendingSeek: number | null = null;
+    let seekTries = 0;
 
     const markCurrent = (i: number) => {
       current = i;
@@ -169,17 +165,17 @@ const counts = Object.fromEntries(
         widget = SC.Widget(iframe);
         widget.bind(SC.Widget.Events.PLAY, () => {
           window.dispatchEvent(new CustomEvent("nah:play", { detail: MINI }));
-          if (pendingSeek) widget.seekTo(pendingSeek);
-          pendingSeek = null;
+          if (pendingSeek !== null) widget.seekTo(pendingSeek);
         });
-        // In a DJ set, follow the timestamps so the title matches what's playing.
         widget.bind(SC.Widget.Events.PLAY_PROGRESS, (e: any) => {
-          if (pendingSeek !== null) return;
-          const pos = e.currentPosition;
-          let best = -1;
-          data.forEach((d, j) => {
-            if (d.url === loadedUrl && d.start <= pos + 500 && (best < 0 || d.start >= data[best].start)) best = j;
-          });
+          // SoundCloud ignores a seek sent too soon after loading: retry until it lands.
+          if (pendingSeek !== null) {
+            if (Math.abs(e.currentPosition - pendingSeek) < 3000 || ++seekTries > 40) pendingSeek = null;
+            else if (seekTries % 4 === 0) widget.seekTo(pendingSeek);
+            return;
+          }
+          // In a DJ set, follow the timestamps so the title matches what's playing.
+          const best = trackAt(loadedUrl, e.currentPosition);
           if (best >= 0 && best !== current) markCurrent(best);
         });
         widget.bind(SC.Widget.Events.FINISH, () => step(1));
@@ -194,16 +190,16 @@ const counts = Object.fromEntries(
         mini.hidden = false;
         root.classList.add("mini-on");
       }
+      pendingSeek = ms;
+      seekTries = 0;
       if (!widget) {
         loadedUrl = d.url;
-        pendingSeek = ms || null;
         setup(d.url);
       } else if (d.url === loadedUrl) {
         widget.seekTo(ms);
         widget.play();
       } else {
         loadedUrl = d.url;
-        pendingSeek = ms || null;
         widget.load(d.url, { ...OPTS, auto_play: true });
       }
     };
@@ -225,13 +221,35 @@ const counts = Object.fromEntries(
       mini.hidden = true;
       root.classList.remove("mini-on");
       markCurrent(-1);
-      // an open row gets its own player back
-      rows.forEach((r) => r.classList.contains("open") && (r.querySelector("sc-player") as any)?.mount?.());
     });
-    // Another player (e.g. the featured mix) started: pause, but stay open.
-    window.addEventListener("nah:play", (e) => {
-      if ((e as CustomEvent).detail !== MINI) widget?.pause();
-    });
+    /** The set track playing at `ms` in recording `url`, or -1. */
+    const trackAt = (url: string | null, ms: number) => {
+      let best = -1;
+      data.forEach((d, j) => {
+        if (d.url === url && d.start <= ms + 500 && (best < 0 || d.start >= data[best].start)) best = j;
+      });
+      return best;
+    };
+
+    // While the mini player is open, pressing play on any SoundCloud player on
+    // the page plays through the mini player instead.
+    (window as any).__nahMini = {
+      active: () => active,
+      route: (player: any, ms: number) => {
+        const row = player.closest(".track") as HTMLLIElement | null;
+        const fresh = ms < 1500; // pressed play without picking a spot on the waveform
+        if (row) {
+          const i = rows.indexOf(row);
+          if (fresh && i === current) widget?.play();
+          else playTrack(i, fresh ? data[i].start : ms);
+          return;
+        }
+        const url = new URL(player.dataset.src).searchParams.get("url");
+        if (fresh && url === loadedUrl) return widget?.play();
+        const i = trackAt(url, ms);
+        if (i >= 0) playTrack(i, ms);
+      },
+    };
 
     /** Move a playing inline player (a track row or the featured mix) into the mini player. */
     const handOver = (player: any) => {
@@ -241,14 +259,8 @@ const counts = Object.fromEntries(
         player.handing = false;
         if (active || !player.playing) return;
         const row = player.closest(".track") as HTMLLIElement | null;
-        let i = row ? rows.indexOf(row) : -1;
-        if (i < 0) {
-          // featured mix: find the set track at this timestamp
-          const url = new URL(player.dataset.src).searchParams.get("url");
-          data.forEach((d, j) => {
-            if (d.url === url && d.start <= ms + 500 && (i < 0 || d.start >= data[i].start)) i = j;
-          });
-        }
+        // featured mix: find the set track at this timestamp
+        const i = row ? rows.indexOf(row) : trackAt(new URL(player.dataset.src).searchParams.get("url"), ms);
         if (i < 0) return;
         player.pause();
         playTrack(i, ms);
@@ -256,9 +268,12 @@ const counts = Object.fromEntries(
     };
 
     // A playing track that scrolls off screen keeps going in the mini player.
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (!e.isIntersecting) handOver(e.target);
-    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.intersectionRatio < 0.5) handOver(e.target);
+      },
+      { threshold: 0.5, rootMargin: "-110px 0px 0px 0px" }, // top margin = the sticky nav
+    );
     document.querySelectorAll("sc-player").forEach((p) => io.observe(p));
 
     // ───── Rows ─────
@@ -272,13 +287,9 @@ const counts = Object.fromEntries(
     const openRow = (row: HTMLLIElement) => {
       row.classList.add("open");
       row.querySelector(".track-head")!.setAttribute("aria-expanded", "true");
+      (row.querySelector("sc-player") as any)?.mount?.();
       if (active) playTrack(rows.indexOf(row)); // mini player is open: switch to this track
-      else (row.querySelector("sc-player") as any)?.mount?.();
     };
-
-    rows.forEach((row, i) =>
-      row.querySelector(".mini-play")!.addEventListener("click", () => playTrack(i)),
-    );
 
     // One track open at a time.
     rows.forEach((row) => {

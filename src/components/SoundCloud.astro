@@ -61,6 +61,15 @@ const src =
         const widget = (this.widget = SC.Widget(iframe));
         let seeked = !startMs;
         widget.bind(SC.Widget.Events.PLAY, () => {
+          // Mini player open: this player acts as its remote, so it never plays itself.
+          const mini = (window as any).__nahMini;
+          if (mini?.active()) {
+            this.position().then((ms) => {
+              widget.pause();
+              mini.route(this, ms);
+            });
+            return;
+          }
           this.playing = true;
           window.dispatchEvent(new CustomEvent("nah:play", { detail: this }));
           if (!seeked) {

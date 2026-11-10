@@ -20,7 +20,7 @@ export interface Track {
   start?: string;
   spotify?: string;
   note?: string;
-  /** Artwork image; when empty a placeholder is shown */
+  /** Artwork image shown when the row is open */
   artwork?: string;
   hidden?: boolean;
 }

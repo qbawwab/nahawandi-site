@@ -77,20 +77,13 @@ const gigs = gigData.gigs;
 
       <TrackBrowser />
 
-      <article class="mix reveal">
-        <Ornament kind="star" size={14} opacity={0.6} class="corner tl" />
-        <Ornament kind="star" size={14} opacity={0.6} class="corner tr" />
-        <Ornament kind="star" size={14} opacity={0.6} class="corner bl" />
-        <Ornament kind="star" size={14} opacity={0.6} class="corner br" />
-        <div class="mix-image"><img src={mix.image} alt={mix.title} loading="lazy" /></div>
-        <div class="mix-details">
-          <span class="eyebrow"><Ornament kind="dot" size={10} /><span class="label">{mix.eyebrow}</span></span>
-          <h3>{mix.title}</h3>
+      <article class="liveset reveal">
+        <div class="liveset-head">
+          <span class="liveset-tag"><span class="live-dot" aria-hidden="true"></span><span class="label">{mix.eyebrow}</span></span>
           <span class="label muted">{mix.meta}</span>
-          <p class="lede">{mix.lede}</p>
-          <div class="player-frame"><SoundCloud url={mix.soundcloud} title={mix.title} /></div>
-          <span class="label muted">{mix.footnote}</span>
         </div>
+        <h3>{mix.title}</h3>
+        <SoundCloud url={mix.soundcloud} title={mix.title} />
       </article>
     </div>
   </section>

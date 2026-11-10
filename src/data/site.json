@@ -13,13 +13,10 @@
     "heading": "The Sound Archive",
     "intro": "Different sounds, one perspective. Three chapters, twenty-one tracks.",
     "mix": {
-      "eyebrow": "FEATURED MIX · FOR BOOKERS",
+      "eyebrow": "LIVE SET",
       "title": "Live at Irgendwo",
-      "meta": "DJ SET · BREMEN · SEPTEMBER 2026",
-      "lede": "The overall sound in one recording, from groove to late-night hypnotic.",
-      "image": "/images/mix.jpg",
-      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo",
-      "footnote": "19 TRACKS · SOUNDCLOUD"
+      "meta": "BREMEN · SEPTEMBER 2026",
+      "soundcloud": "https://soundcloud.com/nahawandi/irgendwo"
     }
   },
   "about": {
@@ -39,11 +36,23 @@
     "ctaLabel": "BOOK A SET"
   },
   "contact": {
-    "emails": ["booking@nahawandi.com", "info@nahawandi.com"],
+    "emails": [
+      "booking@nahawandi.com",
+      "info@nahawandi.com"
+    ],
     "links": [
-      { "name": "SoundCloud", "url": "https://soundcloud.com/nahawandi" },
-      { "name": "Instagram", "url": "#" },
-      { "name": "Resident Advisor", "url": "#" }
+      {
+        "name": "SoundCloud",
+        "url": "https://soundcloud.com/nahawandi"
+      },
+      {
+        "name": "Instagram",
+        "url": "#"
+      },
+      {
+        "name": "Resident Advisor",
+        "url": "#"
+      }
     ],
     "copyright": "© 2026 · NAHAWANDI.COM"
   }

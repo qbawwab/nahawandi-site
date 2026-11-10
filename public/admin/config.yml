@@ -41,16 +41,13 @@ collections:
               - { name: heading, label: "Heading", widget: string }
               - { name: intro, label: "Intro line", widget: text }
               - name: mix
-                label: Featured mix
+                label: Live set
                 widget: object
                 fields:
-                  - { name: eyebrow, label: "Small label above title", widget: string }
+                  - { name: eyebrow, label: "Small label (next to the pulsing dot)", widget: string }
                   - { name: title, label: "Title", widget: string }
                   - { name: meta, label: "Details line", widget: string }
-                  - { name: lede, label: "Description", widget: text }
-                  - { name: image, label: "Photo", widget: image }
                   - { name: soundcloud, label: "SoundCloud link", widget: string }
-                  - { name: footnote, label: "Small line under player", widget: string }
           - name: about
             label: About
             widget: object
@@ -108,8 +105,8 @@ collections:
                   - { label: Groove, value: groove }
                   - { label: Hypnotic, value: hypnotic }
                   - { label: Reimagined, value: reimagined }
-              - { name: description, label: "Description", widget: text }
-              - { name: artwork, label: "Artwork (optional)", widget: image, required: false }
+              - { name: description, label: "Short text about the track (optional)", widget: text, required: false }
+              - { name: artwork, label: "Artwork", widget: image, required: false }
               - { name: soundcloud, label: "SoundCloud link", widget: string }
               - { name: start, label: "Player start time (m:ss, optional)", widget: string, required: false }
               - { name: spotify, label: "Spotify link (optional)", widget: string, required: false }
