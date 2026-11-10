@@ -278,13 +278,10 @@ const counts = Object.fromEntries(
       }
     };
 
-    // Arrows move through the tracks of the current chapter tab, wrapping around.
+    // Arrows walk the whole track list in order, whatever tab or rows are showing.
     const step = (dir: 1 | -1) => {
-      const list = rows.map((r, j) => (r.hidden ? -1 : j)).filter((j) => j >= 0);
-      if (!list.length) return;
-      const at = list.indexOf(current);
-      const next = at < 0 ? list[0] : list[(at + dir + list.length) % list.length];
-      playTrack(next);
+      if (!rows.length) return;
+      playTrack(current < 0 ? 0 : (current + dir + rows.length) % rows.length);
     };
 
     mini.querySelector(".mini-prev")!.addEventListener("click", () => step(-1));
