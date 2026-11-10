@@ -106,13 +106,20 @@ const counts = Object.fromEntries(
       if (!expanded) root.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
+    const setOpen = (row: HTMLLIElement, open: boolean) => {
+      row.classList.toggle("open", open);
+      row.querySelector(".track-head")!.setAttribute("aria-expanded", String(open));
+      const player = row.querySelector("sc-player") as any;
+      if (open) player?.mount?.();
+      else player?.pause?.();
+    };
+
+    // One track open at a time: opening a track closes (and pauses) the others.
     rows.forEach((row) => {
-      const head = row.querySelector<HTMLButtonElement>(".track-head")!;
-      head.addEventListener("click", () => {
+      row.querySelector(".track-head")!.addEventListener("click", () => {
         const open = !row.classList.contains("open");
-        row.classList.toggle("open", open);
-        head.setAttribute("aria-expanded", String(open));
-        if (open) (row.querySelector("sc-player") as any)?.mount?.();
+        if (open) rows.forEach((r) => r !== row && r.classList.contains("open") && setOpen(r, false));
+        setOpen(row, open);
       });
     });
 

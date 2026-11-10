@@ -58,6 +58,12 @@ const src =
         });
       });
     }
+    /** Stops playback (used when a track row is closed). */
+    pause() {
+      const iframe = this.querySelector("iframe");
+      if (!iframe) return;
+      loadApi().then((SC) => SC.Widget(iframe).pause());
+    }
   }
   if (!customElements.get("sc-player")) customElements.define("sc-player", SCPlayer);
 </script>
