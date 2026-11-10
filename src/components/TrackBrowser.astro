@@ -233,19 +233,40 @@ const counts = Object.fromEntries(
       if ((e as CustomEvent).detail !== MINI) widget?.pause();
     });
 
+    /** Move a playing inline player (a track row or the featured mix) into the mini player. */
+    const handOver = (player: any) => {
+      if (active || !player?.playing || player.handing) return;
+      player.handing = true;
+      player.position().then((ms: number) => {
+        player.handing = false;
+        if (active || !player.playing) return;
+        const row = player.closest(".track") as HTMLLIElement | null;
+        let i = row ? rows.indexOf(row) : -1;
+        if (i < 0) {
+          // featured mix: find the set track at this timestamp
+          const url = new URL(player.dataset.src).searchParams.get("url");
+          data.forEach((d, j) => {
+            if (d.url === url && d.start <= ms + 500 && (i < 0 || d.start >= data[i].start)) i = j;
+          });
+        }
+        if (i < 0) return;
+        player.pause();
+        playTrack(i, ms);
+      });
+    };
+
+    // A playing track that scrolls off screen keeps going in the mini player.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (!e.isIntersecting) handOver(e.target);
+    });
+    document.querySelectorAll("sc-player").forEach((p) => io.observe(p));
+
     // ───── Rows ─────
     const closeRow = (row: HTMLLIElement) => {
       row.classList.remove("open");
       row.querySelector(".track-head")!.setAttribute("aria-expanded", "false");
       // A track that's playing when its row closes moves into the mini player.
-      const player = row.querySelector("sc-player") as any;
-      if (!active && player?.playing) {
-        const i = rows.indexOf(row);
-        player.position().then((ms: number) => {
-          player.pause();
-          playTrack(i, ms);
-        });
-      }
+      handOver(row.querySelector("sc-player"));
     };
 
     const openRow = (row: HTMLLIElement) => {
