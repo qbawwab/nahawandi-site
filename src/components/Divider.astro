@@ -1,0 +1,13 @@
+---
+import Ornament from "./Ornament.astro";
+const { bottom = 0 } = Astro.props as { bottom?: number };
+---
+<div class="divider" aria-hidden="true" style={bottom ? `padding-bottom:${bottom}px` : ""}>
+  <div class="wrap">
+    <span class="rule grow-x reveal-hook" style="transform-origin:right"></span>
+    <Ornament kind="dot" size={6} opacity={0.6} />
+    <span class="rot"><Ornament kind="rosette" size={30} opacity={0.9} class="spin" /></span>
+    <Ornament kind="dot" size={6} opacity={0.6} />
+    <span class="rule grow-x reveal-hook" style="transform-origin:left"></span>
+  </div>
+</div>

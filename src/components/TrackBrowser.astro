@@ -1,0 +1,118 @@
+---
+import { tracks, chapters, biNum } from "../data/tracks";
+import SoundCloud from "./SoundCloud.astro";
+
+const VISIBLE = 6; // rows shown before "More tracks"
+const counts = Object.fromEntries(
+  chapters.map((c) => [c.id, c.id === "all" ? tracks.length : tracks.filter((t) => t.categories.includes(c.id as any)).length]),
+);
+---
+<div class="track-browser" data-visible={VISIBLE}>
+  <div class="tabs reveal" role="tablist" aria-label="Chapters">
+    {chapters.map((c, i) => (
+      <button class="tab" role="tab" data-chapter={c.id} aria-selected={i === 0 ? "true" : "false"}>
+        <span class="label">{biNum(i)}</span>
+        <span class="tab-name">{c.label}</span>
+        <span class="count muted">({counts[c.id]})</span>
+      </button>
+    ))}
+  </div>
+
+  <ol class="track-list" style="list-style:none;margin:0;padding:0">
+    {tracks.map((t, i) => (
+      <li class="track" data-cats={t.categories.join(" ")}>
+        <button class="track-head" aria-expanded="false">
+          <span class="label track-num">{biNum(i + 1)}</span>
+          <span class="track-title">{t.title}</span>
+          <span class="track-meta">
+            <span class="label">{t.source}</span>
+            <span class="label">{t.chapter ?? t.categories.map((c) => c.toUpperCase()).join(" / ")}</span>
+            <span class="label">{t.duration}</span>
+          </span>
+          <span class="track-toggle" aria-hidden="true">+</span>
+        </button>
+        <div class="track-body">
+          <div>
+            <div class="track-details">
+              <div class="artwork"><span>ARTWORK PLACEHOLDER</span></div>
+              <div class="track-info">
+                <p class="desc">{t.description}</p>
+                <SoundCloud url={t.soundcloud} start={t.start} lazy />
+                <div class="track-actions">
+                  {t.spotify && (
+                    <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
+                      <span>♫</span> SPOTIFY
+                    </a>
+                  )}
+                  {t.note && <span class="label muted">{t.note}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <div class="more-wrap">
+    <button class="btn-outline more-btn" aria-expanded="false">
+      <span class="more-label">MORE TRACKS</span><span class="more-icon">↓</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".track-browser").forEach((root) => {
+    const visible = Number(root.dataset.visible || 6);
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>(".tab")];
+    const rows = [...root.querySelectorAll<HTMLLIElement>(".track")];
+    const moreWrap = root.querySelector<HTMLElement>(".more-wrap")!;
+    const moreBtn = root.querySelector<HTMLButtonElement>(".more-btn")!;
+    let chapter = "all";
+    let expanded = false;
+
+    const render = () => {
+      let shown = 0;
+      for (const row of rows) {
+        const match = chapter === "all" || (row.dataset.cats || "").split(" ").includes(chapter);
+        row.hidden = !match;
+        row.classList.remove("extra", "collapsed");
+        if (match) {
+          shown++;
+          if (shown > visible) row.classList.add("extra", ...(expanded ? [] : ["collapsed"]));
+        }
+      }
+      moreWrap.hidden = shown <= visible;
+      moreBtn.setAttribute("aria-expanded", String(expanded));
+      moreBtn.querySelector(".more-label")!.textContent = expanded ? "FEWER TRACKS" : `MORE TRACKS (${shown - visible})`;
+      moreBtn.querySelector(".more-icon")!.textContent = expanded ? "↑" : "↓";
+    };
+
+    tabs.forEach((tab) =>
+      tab.addEventListener("click", () => {
+        chapter = tab.dataset.chapter!;
+        expanded = false;
+        tabs.forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+        render();
+      }),
+    );
+
+    moreBtn.addEventListener("click", () => {
+      expanded = !expanded;
+      render();
+      if (!expanded) root.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    rows.forEach((row) => {
+      const head = row.querySelector<HTMLButtonElement>(".track-head")!;
+      head.addEventListener("click", () => {
+        const open = !row.classList.contains("open");
+        row.classList.toggle("open", open);
+        head.setAttribute("aria-expanded", String(open));
+        if (open) (row.querySelector("sc-player") as any)?.mount?.();
+      });
+    });
+
+    render();
+  });
+</script>

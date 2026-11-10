@@ -1,0 +1,63 @@
+---
+/**
+ * SoundCloud in-browser player. Renders the official widget iframe; when `start`
+ * is given ("m:ss" or "h:mm:ss") the first press of play jumps to that point.
+ * With `lazy`, the iframe is only created when the element is activated
+ * (used by the track rows so 21 players don't load at once).
+ */
+interface Props { url: string; start?: string; lazy?: boolean; color?: string }
+const { url, start = "", lazy = false, color = "#000000" } = Astro.props;
+const src =
+  "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url) +
+  "&color=" + encodeURIComponent(color) +
+  "&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false";
+---
+<sc-player class="sc-box" data-src={src} data-start={start} data-lazy={lazy ? "1" : ""}></sc-player>
+
+<script>
+  const toMs = (t: string) => {
+    if (!t) return 0;
+    const parts = t.split(":").map(Number);
+    if (parts.some(isNaN)) return 0;
+    return parts.reduce((acc, n) => acc * 60 + n, 0) * 1000;
+  };
+
+  let apiPromise: Promise<any> | null = null;
+  const loadApi = () =>
+    (apiPromise ??= new Promise((resolve) => {
+      if ((window as any).SC?.Widget) return resolve((window as any).SC);
+      const s = document.createElement("script");
+      s.src = "https://w.soundcloud.com/player/api.js";
+      s.onload = () => resolve((window as any).SC);
+      document.head.appendChild(s);
+    }));
+
+  class SCPlayer extends HTMLElement {
+    mounted = false;
+    connectedCallback() {
+      if (!this.dataset.lazy) this.mount();
+    }
+    mount() {
+      if (this.mounted) return;
+      this.mounted = true;
+      const iframe = document.createElement("iframe");
+      iframe.src = this.dataset.src!;
+      iframe.allow = "autoplay";
+      iframe.loading = "lazy";
+      iframe.title = "SoundCloud player";
+      this.appendChild(iframe);
+      const startMs = toMs(this.dataset.start || "");
+      if (!startMs) return;
+      loadApi().then((SC) => {
+        const widget = SC.Widget(iframe);
+        let seeked = false;
+        widget.bind(SC.Widget.Events.PLAY, () => {
+          if (seeked) return;
+          seeked = true;
+          widget.seekTo(startMs);
+        });
+      });
+    }
+  }
+  if (!customElements.get("sc-player")) customElements.define("sc-player", SCPlayer);
+</script>

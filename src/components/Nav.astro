@@ -1,0 +1,27 @@
+---
+import Ornament from "./Ornament.astro";
+const { home = true } = Astro.props as { home?: boolean };
+const p = home ? "" : "/";
+const links = [
+  ["SOUND", `${p}#sound`],
+  ["ABOUT", `${p}#about`],
+  ["LIVE", `${p}#live`],
+  ["CONTACT", `${p}#contact`],
+];
+---
+<header class="nav">
+  <div class="wrap">
+    <a class="logo wordmark" href="/">NAHAWANDI</a>
+    <nav class="nav-links" aria-label="Main">
+      {links.map(([label, href], i) => (
+        <>
+          {i > 0 && <Ornament kind="dot" size={5} opacity={0.5} />}
+          <a href={href}>{label}</a>
+        </>
+      ))}
+      <a class="btn-outline" href={`${p}#contact`} style="margin-left:18px">
+        <Ornament kind="dot" size={6} />BOOKING<Ornament kind="dot" size={6} />
+      </a>
+    </nav>
+  </div>
+</header>

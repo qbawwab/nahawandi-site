@@ -1,0 +1,63 @@
+---
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Contact from "../components/Contact.astro";
+interface Props { title: string; description: string; home?: boolean }
+const { title, description, home = true } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/images/hero.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Oswald:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <Nav home={home} />
+    <main>
+      <slot />
+    </main>
+    <Contact />
+
+    <script>
+      // Split ".words" elements into per-word spans for the staggered text reveal.
+      document.querySelectorAll<HTMLElement>(".words").forEach((el) => {
+        const words = (el.textContent || "").trim().split(/\s+/);
+        el.setAttribute("aria-label", el.textContent || "");
+        el.innerHTML = words
+          .map((w, i) => `<span class="w" aria-hidden="true" style="transition-delay:${(i * 0.045).toFixed(3)}s">${w}</span>`)
+          .join(" ");
+      });
+
+      // Reveal on scroll.
+      const targets = document.querySelectorAll(".reveal, .reveal-fade, .words, .grow-x");
+      if (!("IntersectionObserver" in window)) {
+        targets.forEach((t) => t.classList.add("in"));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
+        );
+        targets.forEach((t) => io.observe(t));
+      }
+    </script>
+  </body>
+</html>

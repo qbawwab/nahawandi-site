@@ -1,0 +1,175 @@
+---
+import Base from "../layouts/Base.astro";
+import Ornament from "../components/Ornament.astro";
+import ArabicWordmark from "../components/ArabicWordmark.astro";
+import Divider from "../components/Divider.astro";
+import SoundCloud from "../components/SoundCloud.astro";
+import TrackBrowser from "../components/TrackBrowser.astro";
+
+const gigs = [
+  ["SEPTEMBER 2026", "Irgendwo", "BREMEN"],
+  ["SEPTEMBER 2026", "Irgendwo", "BREMEN"],
+  ["JUNE 2026", "PA.RA", "BREMEN"],
+];
+---
+<Base
+  title="Nahawandi — Electronic Music · DJ"
+  description="Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture."
+>
+  <!-- ───── Hero ───── -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-meta reveal-fade">
+        <span class="side"><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">ELECTRONIC MUSIC · DJ</span></span>
+        <span class="centre">
+          <Ornament kind="star" size={14} opacity={0.7} />
+          <ArabicWordmark width={106} />
+          <Ornament kind="star" size={14} opacity={0.7} />
+        </span>
+        <span class="side"><span class="label">AMMAN / BREMEN</span><Ornament kind="dot" size={8} opacity={0.7} /></span>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-photo reveal">
+          <img src="/images/hero.jpg" alt="Nahawandi" fetchpriority="high" />
+          <span class="inner-arch"></span>
+        </div>
+        <div class="hero-stars" aria-hidden="true">
+          <Ornament kind="star" size={18} class="twinkle" style="top:110px;left:70px;--o:.55" opacity={0.55} />
+          <Ornament kind="dot" size={8} class="twinkle" style="top:250px;left:190px;--o:.6;--d:1.2s" opacity={0.6} />
+          <Ornament kind="star" size={12} class="twinkle" style="top:380px;left:40px;--o:.35;--d:2s" opacity={0.35} />
+          <Ornament kind="dot" size={6} class="twinkle" style="top:470px;left:150px;--o:.45;--d:.6s" opacity={0.45} />
+          <span class="rot" style="position:absolute;top:170px;left:120px"><Ornament kind="rosette" size={34} opacity={0.3} class="spin" /></span>
+        </div>
+        <h1 class="hero-name wordmark words">NAHAWANDI</h1>
+      </div>
+
+      <div class="hero-bottom">
+        <p class="hero-copy muted reveal" style="--d:.2s">
+          Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.
+        </p>
+        <div class="hero-cta reveal" style="--d:.35s">
+          <a class="enter" href="#sound"><span class="play-circle">▶</span>ENTER THE SOUND ARCHIVE</a>
+          <span class="label muted float">SCROLL ↓</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Divider />
+
+  <!-- ───── Sound archive ───── -->
+  <section class="sound" id="sound">
+    <div class="wrap">
+      <span class="big-rosette" aria-hidden="true"><Ornament kind="big-rosette" size={190} opacity={0.14} class="spin-slow" /></span>
+
+      <div class="sound-intro">
+        <div class="starband reveal-fade" aria-hidden="true">
+          <Ornament kind="dot" size={5} opacity={0.4} />
+          <Ornament kind="dot" size={8} opacity={0.7} />
+          <Ornament kind="dot" size={5} opacity={0.4} />
+          <span class="rot"><Ornament kind="rosette" size={30} class="spin" /></span>
+          <Ornament kind="dot" size={5} opacity={0.4} />
+          <Ornament kind="dot" size={8} opacity={0.7} />
+          <Ornament kind="dot" size={5} opacity={0.4} />
+        </div>
+        <span class="arabic reveal" style="--d:.05s">الأرشيف</span>
+        <h2 class="words">The Sound Archive</h2>
+        <p class="reveal" style="--d:.25s">Different sounds, one perspective. Three chapters, twenty-one tracks.</p>
+      </div>
+
+      <article class="mix reveal">
+        <Ornament kind="star" size={14} opacity={0.6} class="corner tl" />
+        <Ornament kind="star" size={14} opacity={0.6} class="corner tr" />
+        <Ornament kind="star" size={14} opacity={0.6} class="corner bl" />
+        <Ornament kind="star" size={14} opacity={0.6} class="corner br" />
+        <div class="mix-image"><img src="/images/mix.jpg" alt="Live at Irgendwo" loading="lazy" /></div>
+        <div class="mix-details">
+          <span class="eyebrow"><Ornament kind="dot" size={10} /><span class="label">FEATURED MIX · FOR BOOKERS</span></span>
+          <h3>Live at Irgendwo</h3>
+          <span class="label muted">DJ SET · BREMEN · SEPTEMBER 2026</span>
+          <p class="lede">The overall sound in one recording, from groove to late-night hypnotic.</p>
+          <div class="player-frame"><SoundCloud url="https://soundcloud.com/nahawandi/irgendwo" /></div>
+          <span class="label muted">19 TRACKS · SOUNDCLOUD</span>
+        </div>
+      </article>
+
+      <TrackBrowser />
+    </div>
+  </section>
+
+  <Divider />
+
+  <!-- ───── About ───── -->
+  <section class="about" id="about" style="padding-top:120px">
+    <div class="wrap">
+      <div class="about-split">
+        <div class="about-photo-col reveal">
+          <div class="arch-photo">
+            <img src="/images/about.jpg" alt="Qais — Nahawandi" loading="lazy" />
+            <span class="inner-arch"></span>
+          </div>
+          <div class="caption">
+            <span class="label">QAIS / NAHAWANDI</span>
+            <Ornament kind="star" size={13} opacity={0.6} />
+            <span class="label">BREMEN, 2026</span>
+          </div>
+        </div>
+        <div class="about-copy-col">
+          <div class="about-header reveal-fade">
+            <div class="row">
+              <Ornament kind="dot" size={8} opacity={0.7} />
+              <span class="label">ABOUT</span>
+              <Ornament kind="star" size={13} opacity={0.6} />
+              <span class="arabic">عن</span>
+            </div>
+            <div class="marks">
+              <span class="wordmark">NAHAWANDI</span>
+              <ArabicWordmark width={112} />
+            </div>
+          </div>
+          <div class="about-copy">
+            <h2 class="words">Bringing culture and context into the club.</h2>
+            <p class="story reveal" style="--d:.1s">
+              Rooted between Amman and Bremen, Nahawandi builds danceable electronic grooves around cultural moments, rhythmic systems, voices and fragments drawn from different worlds—reworking them into high-energy electronic frameworks with unexpected twists.
+            </p>
+            <p class="maqam reveal" style="--d:.2s">
+              Derived from the Arabic maqam Nahawand, the name Nahawandi reflects his commitment to bringing new melodic perspectives to contemporary electronic music.
+            </p>
+            <a class="link-line reveal" style="--d:.3s" href="/biography/">READ FULL BIOGRAPHY</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Divider />
+
+  <!-- ───── Live (dates & bookings) ───── -->
+  <section class="archive" id="live">
+    <div class="wrap">
+      <span class="bg-star" aria-hidden="true"><Ornament kind="star" size={70} opacity={0.12} class="spin-slow" /></span>
+      <div class="archive-head">
+        <h2 class="display words">Live</h2>
+        <div class="right reveal-fade">
+          <span class="arabic">الحفلات</span>
+          <Ornament kind="star" size={13} opacity={0.6} />
+          <span class="label">DATES &amp; BOOKINGS</span>
+        </div>
+      </div>
+      {gigs.map(([date, name, place], i) => (
+        <div class="gig reveal" style={`--d:${i * 0.08}s`}>
+          <span class="date">{date}</span>
+          <span class="name">{name}</span>
+          <span class="place"><Ornament kind="star" size={13} opacity={0.6} /><span class="label">{place}</span></span>
+        </div>
+      ))}
+      <div class="live-cta reveal" style="--d:.2s">
+        <p class="muted">Bringing the sound to your night, club or festival?</p>
+        <a class="link-line" href="#contact">BOOK A SET</a>
+      </div>
+    </div>
+  </section>
+
+  <Divider bottom={90} />
+</Base>

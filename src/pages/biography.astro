@@ -1,0 +1,53 @@
+---
+import Base from "../layouts/Base.astro";
+import Ornament from "../components/Ornament.astro";
+import ArabicWordmark from "../components/ArabicWordmark.astro";
+import Divider from "../components/Divider.astro";
+
+const lead =
+  "Rooted between Amman and Bremen, Nahawandi builds danceable electronic grooves around cultural moments, rhythmic systems, voices and fragments drawn from different worlds, reworking them into high-energy electronic frameworks with unexpected twists.";
+
+const paragraphs = [
+  "Rooted between Amman and Bremen, Nahawandi creates contemporary electronic music shaped by voices, rhythms and folk traditions rarely heard in club culture.",
+  "Drawing from regional melodic languages and musical systems, his work explores how these traditions can exist naturally within electronic music without being reduced to aesthetic references or stylistic embellishments.",
+  "Rather than using these traditions as ornamentation in his tracks, he builds the music around them. Electronic music becomes the framework through which they can exist as rhythmic, danceable experiences without losing their identity. The result is music that connects different musical worlds while remaining rooted in the energy and communal experience of the dancefloor.",
+  "Derived from the Arabic maqam Nahawand, the name Nahawandi reflects his commitment to bringing new melodic perspectives to contemporary electronic music. Through original productions, reworks and live performances, he creates space for musical languages that remain largely absent from today’s electronic music landscape. His live sets are approached as evolving performances rather than fixed sequences, allowing him to reshape arrangements, extend musical ideas and respond to the energy of the room in real time.",
+];
+---
+<Base title="Biography — Nahawandi" description={lead} home={false}>
+  <section class="letter">
+    <div class="wrap">
+      <article class="sheet reveal">
+        <Ornament kind="rosette" size={22} class="corner tl" />
+        <Ornament kind="rosette" size={22} class="corner tr" />
+        <Ornament kind="rosette" size={22} class="corner bl" />
+        <Ornament kind="rosette" size={22} class="corner br" />
+        <div class="sheet-inner">
+          <div class="starband reveal-fade" aria-hidden="true">
+            <Ornament kind="dot" size={5} opacity={0.4} />
+            <Ornament kind="dot" size={8} opacity={0.7} />
+            <span class="rot"><Ornament kind="rosette" size={30} class="spin" /></span>
+            <Ornament kind="dot" size={8} opacity={0.7} />
+            <Ornament kind="dot" size={5} opacity={0.4} />
+          </div>
+          <span class="arabic reveal" style="--d:.1s">سيرة</span>
+          <h1 class="words">Biography</h1>
+          <span class="label muted reveal" style="--d:.3s">AMMAN · BREMEN</span>
+          <span class="short-rule grow-x"></span>
+          <p class="lead reveal">{lead}</p>
+          <span class="short-rule grow-x"></span>
+          <div class="body">
+            {paragraphs.map((p) => <p class="reveal">{p}</p>)}
+          </div>
+          <span class="short-rule grow-x"></span>
+          <div class="sign reveal">
+            <span class="wordmark">NAHAWANDI</span>
+            <ArabicWordmark width={90} />
+          </div>
+          <a class="back label reveal" href="/">← BACK TO HOME</a>
+        </div>
+      </article>
+    </div>
+  </section>
+  <Divider bottom={90} />
+</Base>
