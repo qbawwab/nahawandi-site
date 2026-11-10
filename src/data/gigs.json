@@ -1,7 +1,19 @@
 {
   "gigs": [
-    { "date": "SEPTEMBER 2026", "name": "Irgendwo", "place": "BREMEN" },
-    { "date": "SEPTEMBER 2026", "name": "Irgendwo", "place": "BREMEN" },
-    { "date": "JUNE 2026", "name": "PA.RA", "place": "BREMEN" }
+    {
+      "date": "04.04.2026",
+      "name": "Get Well Soon",
+      "place": "BREMEN"
+    },
+    {
+      "date": "13.06.2026",
+      "name": "PA.RA",
+      "place": "BREMEN"
+    },
+    {
+      "date": "05.09.2026",
+      "name": "Irgendwo",
+      "place": "BREMEN"
+    }
   ]
 }

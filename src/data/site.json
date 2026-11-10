@@ -6,7 +6,21 @@
     "tagRight": "AMMAN / BREMEN",
     "image": "/images/hero.jpg",
     "copy": "Nahawandi turns cultural voices, melodies and rhythms into driving, groove-heavy techno and electronica with unexpected twists.",
-    "cta": "ENTER THE SOUND ARCHIVE"
+    "cta": "ENTER THE SOUND ARCHIVE",
+    "links": [
+      {
+        "name": "Spotify",
+        "url": "https://open.spotify.com/artist/4mtzg0pP5fRXyxmzproI2k"
+      },
+      {
+        "name": "SoundCloud",
+        "url": "https://soundcloud.com/nahawandi"
+      },
+      {
+        "name": "Apple Music",
+        "url": "https://music.apple.com/artist/nahawandi/1893154801"
+      }
+    ]
   },
   "sound": {
     "arabic": "الأرشيف",

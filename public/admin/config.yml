@@ -33,6 +33,13 @@ collections:
               - { name: image, label: "Hero photo (arch)", widget: image }
               - { name: copy, label: "Intro text", widget: text }
               - { name: cta, label: "Button text", widget: string }
+              - name: links
+                label: "Listen links (under the left tag)"
+                widget: list
+                summary: "{{fields.name}}"
+                fields:
+                  - { name: name, label: "Name", widget: string }
+                  - { name: url, label: "Link", widget: string }
           - name: sound
             label: Sound Archive
             widget: object

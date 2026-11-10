@@ -28,6 +28,14 @@ const gigs = gigData.gigs;
         <span class="side"><span class="label">{hero.tagRight}</span><Ornament kind="dot" size={8} opacity={0.7} /></span>
       </div>
 
+      <nav class="hero-listen reveal-fade" aria-label="Listen on">
+        <div class="hero-listen-links">
+          {hero.links.map(({ name, url }) => (
+            <a class="label" href={url} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={11} /></a>
+          ))}
+        </div>
+      </nav>
+
       <div class="hero-visual">
         <div class="hero-photo reveal">
           <img src={hero.image} alt="Nahawandi" fetchpriority="high" />
