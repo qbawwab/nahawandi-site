@@ -40,7 +40,7 @@ const counts = Object.fromEntries(
                 : <div class="artwork"><span>ARTWORK PLACEHOLDER</span></div>}
               <div class="track-info">
                 <p class="desc">{t.description}</p>
-                <SoundCloud url={t.soundcloud} start={t.start} lazy />
+                <SoundCloud url={t.soundcloud} start={t.start} title={t.title} lazy />
                 <div class="track-actions">
                   {t.spotify && (
                     <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
@@ -110,8 +110,12 @@ const counts = Object.fromEntries(
       row.classList.toggle("open", open);
       row.querySelector(".track-head")!.setAttribute("aria-expanded", String(open));
       const player = row.querySelector("sc-player") as any;
-      if (open) player?.mount?.();
-      else player?.pause?.();
+      if (open) {
+        player?.undock?.();
+        player?.mount?.();
+      } else if (player?.playing) {
+        player.dock(); // keep the music going in the mini player
+      }
     };
 
     // One track open at a time: opening a track closes (and pauses) the others.

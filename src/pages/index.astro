@@ -75,6 +75,8 @@ const gigs = gigData.gigs;
         <p class="reveal" style="--d:.25s">{sound.intro}</p>
       </div>
 
+      <TrackBrowser />
+
       <article class="mix reveal">
         <Ornament kind="star" size={14} opacity={0.6} class="corner tl" />
         <Ornament kind="star" size={14} opacity={0.6} class="corner tr" />
@@ -86,12 +88,10 @@ const gigs = gigData.gigs;
           <h3>{mix.title}</h3>
           <span class="label muted">{mix.meta}</span>
           <p class="lede">{mix.lede}</p>
-          <div class="player-frame"><SoundCloud url={mix.soundcloud} /></div>
+          <div class="player-frame"><SoundCloud url={mix.soundcloud} title={mix.title} /></div>
           <span class="label muted">{mix.footnote}</span>
         </div>
       </article>
-
-      <TrackBrowser />
     </div>
   </section>
 
