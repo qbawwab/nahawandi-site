@@ -21,7 +21,7 @@ const counts = Object.fromEntries(
 
   <ol class="track-list" style="list-style:none;margin:0;padding:0">
     {tracks.map((t, i) => (
-      <li class="track" data-cats={t.categories.join(" ")}>
+      <li class="track" data-cats={t.categories.join(" ")} data-url={t.soundcloud} data-start={t.start ?? ""} data-title={t.title}>
         <button class="track-head" aria-expanded="false">
           <span class="label track-num">{biNum(i + 1)}</span>
           <span class="track-title">{t.title}</span>
@@ -41,6 +41,9 @@ const counts = Object.fromEntries(
               <div class="track-info">
                 <p class="desc">{t.description}</p>
                 <SoundCloud url={t.soundcloud} start={t.start} title={t.title} lazy />
+                <button type="button" class="btn-line mini-play">
+                  <Icon name="play" size={12} /><span class="mp-go">PLAY IN MINI PLAYER</span><span class="mp-now">NOW PLAYING</span>
+                </button>
                 <div class="track-actions">
                   {t.spotify && (
                     <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
@@ -61,6 +64,20 @@ const counts = Object.fromEntries(
     <button class="btn-outline more-btn" aria-expanded="false">
       <span class="more-label">MORE TRACKS</span><span class="more-icon"><Icon name="arrow-down" size={13} /></span>
     </button>
+  </div>
+
+  <!-- Mini player: opens when a playing track is closed, then stays until the visitor closes it -->
+  <div class="mini" hidden aria-label="Mini player">
+    <div class="mini-head">
+      <span class="mini-label">NOW PLAYING</span>
+      <span class="mini-title"></span>
+      <div class="mini-ctrls">
+        <button type="button" class="mini-btn mini-prev" aria-label="Previous track"><Icon name="prev" size={13} /></button>
+        <button type="button" class="mini-btn mini-next" aria-label="Next track"><Icon name="next" size={13} /></button>
+        <button type="button" class="mini-btn mini-close" aria-label="Stop and close player"><Icon name="close" size={13} /></button>
+      </div>
+    </div>
+    <div class="mini-frame"></div>
   </div>
 </div>
 
@@ -106,24 +123,148 @@ const counts = Object.fromEntries(
       if (!expanded) root.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    const setOpen = (row: HTMLLIElement, open: boolean) => {
-      row.classList.toggle("open", open);
-      row.querySelector(".track-head")!.setAttribute("aria-expanded", String(open));
-      const player = row.querySelector("sc-player") as any;
-      if (open) {
-        player?.undock?.();
-        player?.mount?.();
-      } else if (player?.playing) {
-        player.dock(); // keep the music going in the mini player
+    // ───── Mini player ─────
+    const toMs = (t: string) => {
+      if (!t) return 0;
+      const parts = t.split(":").map(Number);
+      return parts.some(isNaN) ? 0 : parts.reduce((acc, n) => acc * 60 + n, 0) * 1000;
+    };
+    const loadApi = (): Promise<any> =>
+      ((window as any).__scApi ??= new Promise((resolve) => {
+        if ((window as any).SC?.Widget) return resolve((window as any).SC);
+        const s = document.createElement("script");
+        s.src = "https://w.soundcloud.com/player/api.js";
+        s.onload = () => resolve((window as any).SC);
+        document.head.appendChild(s);
+      }));
+    const OPTS = { color: "#000000", hide_related: true, show_comments: false, show_user: true, show_reposts: false, show_teaser: false, visual: false };
+    const widgetSrc = (url: string) =>
+      "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url) + "&auto_play=true&" +
+      Object.entries(OPTS).map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&");
+
+    const data = rows.map((r) => ({ url: r.dataset.url!, start: toMs(r.dataset.start || ""), title: r.dataset.title || "" }));
+    const mini = root.querySelector<HTMLElement>(".mini")!;
+    const miniTitle = mini.querySelector(".mini-title")!;
+    const frame = mini.querySelector(".mini-frame")!;
+    const MINI = "mini";
+    let active = false; // mini player is open
+    let widget: any = null;
+    let loadedUrl = "";
+    let current = -1;
+    let pendingSeek: number | null = null;
+
+    const markCurrent = (i: number) => {
+      current = i;
+      rows.forEach((r, j) => r.classList.toggle("is-current", j === i));
+      miniTitle.textContent = data[i]?.title || "";
+    };
+
+    const setup = (url: string) =>
+      loadApi().then((SC) => {
+        const iframe = document.createElement("iframe");
+        iframe.allow = "autoplay";
+        iframe.title = "SoundCloud mini player";
+        iframe.src = widgetSrc(url);
+        frame.appendChild(iframe);
+        widget = SC.Widget(iframe);
+        widget.bind(SC.Widget.Events.PLAY, () => {
+          window.dispatchEvent(new CustomEvent("nah:play", { detail: MINI }));
+          if (pendingSeek) widget.seekTo(pendingSeek);
+          pendingSeek = null;
+        });
+        // In a DJ set, follow the timestamps so the title matches what's playing.
+        widget.bind(SC.Widget.Events.PLAY_PROGRESS, (e: any) => {
+          if (pendingSeek !== null) return;
+          const pos = e.currentPosition;
+          let best = -1;
+          data.forEach((d, j) => {
+            if (d.url === loadedUrl && d.start <= pos + 500 && (best < 0 || d.start >= data[best].start)) best = j;
+          });
+          if (best >= 0 && best !== current) markCurrent(best);
+        });
+        widget.bind(SC.Widget.Events.FINISH, () => step(1));
+      });
+
+    /** Play track i in the mini player, from `ms` (defaults to its timestamp). */
+    const playTrack = (i: number, ms = data[i].start) => {
+      const d = data[i];
+      markCurrent(i);
+      if (!active) {
+        active = true;
+        mini.hidden = false;
+        root.classList.add("mini-on");
+      }
+      if (!widget) {
+        loadedUrl = d.url;
+        pendingSeek = ms || null;
+        setup(d.url);
+      } else if (d.url === loadedUrl) {
+        widget.seekTo(ms);
+        widget.play();
+      } else {
+        loadedUrl = d.url;
+        pendingSeek = ms || null;
+        widget.load(d.url, { ...OPTS, auto_play: true });
       }
     };
 
-    // One track open at a time: opening a track closes (and pauses) the others.
+    // Arrows move through the tracks of the current chapter tab, wrapping around.
+    const step = (dir: 1 | -1) => {
+      const list = rows.map((r, j) => (r.hidden ? -1 : j)).filter((j) => j >= 0);
+      if (!list.length) return;
+      const at = list.indexOf(current);
+      const next = at < 0 ? list[0] : list[(at + dir + list.length) % list.length];
+      playTrack(next);
+    };
+
+    mini.querySelector(".mini-prev")!.addEventListener("click", () => step(-1));
+    mini.querySelector(".mini-next")!.addEventListener("click", () => step(1));
+    mini.querySelector(".mini-close")!.addEventListener("click", () => {
+      widget?.pause();
+      active = false;
+      mini.hidden = true;
+      root.classList.remove("mini-on");
+      markCurrent(-1);
+      // an open row gets its own player back
+      rows.forEach((r) => r.classList.contains("open") && (r.querySelector("sc-player") as any)?.mount?.());
+    });
+    // Another player (e.g. the featured mix) started: pause, but stay open.
+    window.addEventListener("nah:play", (e) => {
+      if ((e as CustomEvent).detail !== MINI) widget?.pause();
+    });
+
+    // ───── Rows ─────
+    const closeRow = (row: HTMLLIElement) => {
+      row.classList.remove("open");
+      row.querySelector(".track-head")!.setAttribute("aria-expanded", "false");
+      // A track that's playing when its row closes moves into the mini player.
+      const player = row.querySelector("sc-player") as any;
+      if (!active && player?.playing) {
+        const i = rows.indexOf(row);
+        player.position().then((ms: number) => {
+          player.pause();
+          playTrack(i, ms);
+        });
+      }
+    };
+
+    const openRow = (row: HTMLLIElement) => {
+      row.classList.add("open");
+      row.querySelector(".track-head")!.setAttribute("aria-expanded", "true");
+      if (active) playTrack(rows.indexOf(row)); // mini player is open: switch to this track
+      else (row.querySelector("sc-player") as any)?.mount?.();
+    };
+
+    rows.forEach((row, i) =>
+      row.querySelector(".mini-play")!.addEventListener("click", () => playTrack(i)),
+    );
+
+    // One track open at a time.
     rows.forEach((row) => {
       row.querySelector(".track-head")!.addEventListener("click", () => {
-        const open = !row.classList.contains("open");
-        if (open) rows.forEach((r) => r !== row && r.classList.contains("open") && setOpen(r, false));
-        setOpen(row, open);
+        if (row.classList.contains("open")) return closeRow(row);
+        rows.forEach((r) => r !== row && r.classList.contains("open") && closeRow(r));
+        openRow(row);
       });
     });
 

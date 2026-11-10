@@ -1,13 +1,12 @@
 ---
 /**
- * SoundCloud in-browser player. Renders the official widget iframe; when `start`
- * is given ("m:ss" or "h:mm:ss") the first press of play jumps to that point.
- * With `lazy`, the iframe is only created when the element is activated
- * (used by the track rows so 21 players don't load at once).
+ * Inline SoundCloud player (official widget iframe). When `start` is given
+ * ("m:ss" or "h:mm:ss") the first press of play jumps to that point. With
+ * `lazy`, the iframe is only created when the element is activated (used by
+ * the track rows so 21 players don't load at once).
  *
- * Only one player plays at a time. A playing track whose row is closed is
- * "docked": the same element turns into a mini player pinned bottom-right,
- * so the music keeps going (the iframe is never moved, so it never reloads).
+ * Only one thing plays at a time: every player (and the mini player in
+ * TrackBrowser) announces "nah:play" and pauses when someone else does.
  */
 interface Props { url: string; start?: string; lazy?: boolean; color?: string; title?: string }
 const { url, start = "", lazy = false, color = "#000000", title = "" } = Astro.props;
@@ -26,9 +25,8 @@ const src =
     return parts.reduce((acc, n) => acc * 60 + n, 0) * 1000;
   };
 
-  let apiPromise: Promise<any> | null = null;
-  const loadApi = () =>
-    (apiPromise ??= new Promise((resolve) => {
+  const loadApi = (): Promise<any> =>
+    ((window as any).__scApi ??= new Promise((resolve) => {
       if ((window as any).SC?.Widget) return resolve((window as any).SC);
       const s = document.createElement("script");
       s.src = "https://w.soundcloud.com/player/api.js";
@@ -43,28 +41,14 @@ const src =
 
     connectedCallback() {
       if (!this.dataset.lazy) this.mount();
+      window.addEventListener("nah:play", (e) => {
+        if ((e as CustomEvent).detail !== this && this.playing) this.pause();
+      });
     }
 
     mount() {
       if (this.mounted) return;
       this.mounted = true;
-
-      // Header shown only while docked: "Now playing", title, close.
-      const head = document.createElement("div");
-      head.className = "sc-dock-head";
-      head.innerHTML =
-        '<span class="sc-dock-label">NOW PLAYING</span>' +
-        '<span class="sc-dock-title"></span>' +
-        '<button type="button" class="sc-dock-close" aria-label="Stop and close player">' +
-        '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>' +
-        "</button>";
-      head.querySelector(".sc-dock-title")!.textContent = this.dataset.title || "";
-      head.querySelector("button")!.addEventListener("click", () => {
-        this.pause();
-        this.undock();
-      });
-      this.appendChild(head);
-
       const iframe = document.createElement("iframe");
       iframe.src = this.dataset.src!;
       iframe.allow = "autoplay";
@@ -78,23 +62,14 @@ const src =
         let seeked = !startMs;
         widget.bind(SC.Widget.Events.PLAY, () => {
           this.playing = true;
-          // Only one player at a time across the page.
-          document.querySelectorAll<SCPlayer>("sc-player").forEach((p) => {
-            if (p !== this && p.playing) {
-              p.pause();
-              p.undock();
-            }
-          });
+          window.dispatchEvent(new CustomEvent("nah:play", { detail: this }));
           if (!seeked) {
             seeked = true;
             widget.seekTo(startMs);
           }
         });
         widget.bind(SC.Widget.Events.PAUSE, () => (this.playing = false));
-        widget.bind(SC.Widget.Events.FINISH, () => {
-          this.playing = false;
-          this.undock();
-        });
+        widget.bind(SC.Widget.Events.FINISH, () => (this.playing = false));
       });
     }
 
@@ -103,14 +78,9 @@ const src =
       this.widget?.pause();
     }
 
-    dock() {
-      this.classList.add("docked");
-      this.closest(".track")?.classList.add("has-dock");
-    }
-
-    undock() {
-      this.classList.remove("docked");
-      this.closest(".track")?.classList.remove("has-dock");
+    /** Current position in ms (0 if not ready). */
+    position(): Promise<number> {
+      return new Promise((resolve) => (this.widget ? this.widget.getPosition(resolve) : resolve(0)));
     }
   }
   if (!customElements.get("sc-player")) customElements.define("sc-player", SCPlayer);
