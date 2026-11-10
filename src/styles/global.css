@@ -209,6 +209,25 @@ sc-player { display: block; }
 .mini-btn { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid rgba(255, 255, 255, .3); border-radius: 50%; transition: background .3s, color .3s, border-color .3s; }
 .mini-btn:hover { background: #fff; color: #000; border-color: #fff; }
 .mini-btn .icon { vertical-align: 0; }
+.mini-vol { display: flex; align-items: center; gap: 12px; padding: 0 12px 12px 8px; }
+.mini.no-volume .mini-vol { display: none; }
+.mini-mute { width: 24px; height: 24px; display: grid; place-items: center; flex: none; color: var(--muted); transition: color .3s; }
+.mini-mute:hover { color: #fff; }
+.mini-mute .icon { vertical-align: 0; display: block; }
+.mini-mute .v-off, .mini.is-muted .mini-mute .v-on { display: none; }
+.mini.is-muted .mini-mute .v-off { display: block; }
+.mini-range { -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 18px; margin: 0; background: transparent; cursor: pointer; --v: 100%; }
+.mini-range::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #fff var(--v), rgba(255, 255, 255, .25) var(--v)); }
+.mini-range::-moz-range-track { height: 2px; background: rgba(255, 255, 255, .25); }
+.mini-range::-moz-range-progress { height: 2px; background: #fff; }
+.mini-range::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -5px; border-radius: 50%; background: #fff; border: 0; }
+.mini-range::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 0; }
+.mini-range:focus-visible { outline: 1px solid #fff; outline-offset: 2px; }
+@media (pointer: coarse) {
+  .mini-range { height: 28px; }
+  .mini-range::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -8px; }
+  .mini-range::-moz-range-thumb { width: 18px; height: 18px; }
+}
 .mini-frame { height: 166px; background: #111; }
 .mini-frame iframe { display: block; width: 100%; height: 166px; border: 0; }
 @keyframes dock-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }

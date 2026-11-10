@@ -72,6 +72,12 @@ const counts = Object.fromEntries(
         <button type="button" class="mini-btn mini-close" aria-label="Stop and close player"><Icon name="close" size={13} /></button>
       </div>
     </div>
+    <div class="mini-vol">
+      <button type="button" class="mini-mute" aria-label="Mute">
+        <span class="v-on"><Icon name="volume" size={16} /></span><span class="v-off"><Icon name="mute" size={16} /></span>
+      </button>
+      <input type="range" class="mini-range" min="0" max="100" step="1" value="100" aria-label="Volume" />
+    </div>
     <div class="mini-frame"></div>
   </div>
 </div>
@@ -152,6 +158,51 @@ const counts = Object.fromEntries(
     let loadToken = 0;
     let switchedAt = 0;
 
+    // Volume (remembered between visits where the browser allows it)
+    const range = mini.querySelector<HTMLInputElement>(".mini-range")!;
+    const muteBtn = mini.querySelector<HTMLButtonElement>(".mini-mute")!;
+    const readVolume = () => {
+      try {
+        const v = Number(localStorage.getItem("nah:volume") ?? 100);
+        return v >= 0 && v <= 100 ? v : 100;
+      } catch {
+        return 100;
+      }
+    };
+    let volume = readVolume();
+    let muted = false;
+    const applyVolume = () => {
+      const level = muted ? 0 : volume;
+      widget?.setVolume(level);
+      range.value = String(level);
+      range.style.setProperty("--v", `${level}%`);
+      mini.classList.toggle("is-muted", level === 0);
+      muteBtn.setAttribute("aria-label", level === 0 ? "Unmute" : "Mute");
+    };
+    const saveVolume = () => {
+      try {
+        localStorage.setItem("nah:volume", String(volume));
+      } catch {}
+    };
+    range.addEventListener("input", () => {
+      volume = Number(range.value);
+      muted = false;
+      applyVolume();
+      saveVolume();
+    });
+    muteBtn.addEventListener("click", () => {
+      if (!muted && volume === 0) {
+        volume = 70;
+        saveVolume();
+      } else muted = !muted;
+      applyVolume();
+    });
+    // iPhones and iPads don't let websites change volume: use the device buttons there.
+    if (/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+      mini.classList.add("no-volume");
+    }
+    applyVolume();
+
     const markCurrent = (i: number) => {
       current = i;
       rows.forEach((r, j) => r.classList.toggle("is-current", j === i));
@@ -169,6 +220,7 @@ const counts = Object.fromEntries(
         widget.bind(SC.Widget.Events.PLAY, () => {
           if (!active) return widget.pause(); // closed while a track was loading
           window.dispatchEvent(new CustomEvent("nah:play", { detail: MINI }));
+          applyVolume(); // a newly loaded recording starts at its own default
           if (!loading && pendingSeek !== null) widget.seekTo(pendingSeek);
         });
         widget.bind(SC.Widget.Events.PLAY_PROGRESS, (e: any) => {
