@@ -94,7 +94,7 @@ collections:
                 summary: "{{fields.name}}"
                 fields:
                   - { name: name, label: "Name", widget: string, required: false }
-                  - { name: url, label: "Link (use # for none yet)", widget: string, required: false }
+                  - { name: url, label: "Link (leave empty or # to hide it)", widget: string, required: false }
               - { name: copyright, label: "Footer line", widget: string, required: false }
 
       # ───────── Tracks ─────────

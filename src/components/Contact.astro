@@ -5,7 +5,8 @@ import Icon from "./Icon.astro";
 import site from "../data/site.json";
 const contact: any = (site as any).contact ?? {};
 const emails: string[] = (contact.emails ?? []).filter(Boolean);
-const links = (contact.links ?? []).filter((l: any) => l?.name);
+// Links still set to "#" (or empty) are placeholders and stay hidden.
+const links = (contact.links ?? []).filter((l: any) => l?.name && l?.url && l.url !== "#");
 const copyright = contact.copyright;
 ---
 <section class="contact" id="contact">
@@ -25,7 +26,7 @@ const copyright = contact.copyright;
         <span class="label col-label">ELSEWHERE</span>
         <div class="elsewhere">
           {links.map(({ name, url }: any) => (
-            <a href={url || "#"} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={18} /></a>
+            <a href={url} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={18} /></a>
           ))}
         </div>
       </div>}
