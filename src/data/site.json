@@ -2,7 +2,7 @@
   "seoTitle": "Nahawandi — Electronic Music · DJ",
   "seoDescription": "Nahawandi turns cultural voices, melodies and rhythms into driving, groove-heavy techno and electronica with unexpected twists.",
   "hero": {
-    "tagLeft": "ELECTRONIC MUSIC · DJ",
+    "tagLeft": "LIVE ELECTRONIC MUSIC · PRODUCER · DJ",
     "tagRight": "AMMAN / BREMEN",
     "image": "/images/hero.jpg",
     "copy": "Nahawandi turns cultural voices, melodies and rhythms into driving, groove-heavy techno and electronica with unexpected twists.",
@@ -25,7 +25,7 @@
   "sound": {
     "arabic": "الأرشيف",
     "heading": "The Sound Archive",
-    "intro": "Different sounds, one perspective. Three chapters, twenty-one tracks.",
+    "intro": "test",
     "mix": {
       "eyebrow": "LIVE SET",
       "title": "Live at Irgendwo",
@@ -61,11 +61,11 @@
       },
       {
         "name": "Instagram",
-        "url": "https://www.instagram.com/nahawandi_/"
+        "url": "#"
       },
       {
         "name": "Resident Advisor",
-        "url": "https://ra.co/dj/nahawandi"
+        "url": "#"
       }
     ],
     "copyright": "© 2026 · NAHAWANDI.COM"
