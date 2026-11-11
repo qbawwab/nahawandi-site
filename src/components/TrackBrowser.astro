@@ -286,7 +286,7 @@ const counts = Object.fromEntries(
 
     mini.querySelector(".mini-prev")!.addEventListener("click", () => step(-1));
     mini.querySelector(".mini-next")!.addEventListener("click", () => step(1));
-    mini.querySelector(".mini-close")!.addEventListener("click", () => {
+    const closeMini = () => {
       widget?.pause();
       active = false;
       loading = false;
@@ -294,6 +294,13 @@ const counts = Object.fromEntries(
       mini.hidden = true;
       root.classList.remove("mini-on");
       markCurrent(-1);
+    };
+    mini.querySelector(".mini-close")!.addEventListener("click", closeMini);
+
+    // Phones get no mini player: tracks play in their own row only.
+    const phone = matchMedia("(max-width: 809px)");
+    phone.addEventListener("change", () => {
+      if (phone.matches && active) closeMini();
     });
     /** The set track playing at `ms` in recording `url`, or -1. */
     const trackAt = (url: string | null, ms: number) => {
@@ -326,6 +333,7 @@ const counts = Object.fromEntries(
 
     /** Move a playing inline player (a track row or the featured mix) into the mini player. */
     const handOver = (player: any) => {
+      if (phone.matches) return;
       if (active || !player?.playing || player.handing) return;
       player.handing = true;
       player.position().then((ms: number) => {
@@ -353,8 +361,11 @@ const counts = Object.fromEntries(
     const closeRow = (row: HTMLLIElement) => {
       row.classList.remove("open");
       row.querySelector(".track-head")!.setAttribute("aria-expanded", "false");
-      // A track that's playing when its row closes moves into the mini player.
-      handOver(row.querySelector("sc-player"));
+      // A track that's playing when its row closes moves into the mini player
+      // (on phones it just stops).
+      const player = row.querySelector("sc-player") as any;
+      if (phone.matches) player?.playing && player.pause();
+      else handOver(player);
     };
 
     const openRow = (row: HTMLLIElement) => {

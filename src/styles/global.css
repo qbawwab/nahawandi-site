@@ -137,7 +137,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero-copy { max-width: 600px; font-style: italic; font-size: 29px; letter-spacing: -0.02em; line-height: 1.4; }
 .hero-cta { display: flex; align-items: center; gap: 24px; }
 .play-circle {
-  width: 70px; height: 70px; border-radius: 50%;
+  width: 70px; height: 70px; flex: none; aspect-ratio: 1; border-radius: 50%;
   border: 1.5px solid #fff;
   display: grid; place-items: center; font-size: 16px;
   transition: background .35s var(--ease), color .35s var(--ease), transform .35s var(--ease);
@@ -167,7 +167,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .hero-copy { font-size: 20px; }
   .hero-cta, .hero-cta .enter { gap: 18px; }
   .play-circle { width: 56px; height: 56px; }
-  .hero-cta .enter { font-size: 15px; }
+  .play-circle .icon { width: 16px; height: 16px; margin-left: 2px; }
+  .hero-cta .enter { font-size: 13.5px; letter-spacing: .14em; white-space: nowrap; }
+  .hero-cta .scroll-hint { display: none; }
 }
 
 /* ───────── Ornament divider ───────── */
@@ -232,9 +234,9 @@ sc-player { display: block; }
 .mini-frame { height: 166px; background: #111; }
 .mini-frame iframe { display: block; width: 100%; height: 166px; border: 0; }
 @keyframes dock-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+/* Phones: no mini player, tracks play in their own row. */
 @media (max-width: 809px) {
-  .mini { left: 12px; right: 12px; bottom: 12px; width: auto; }
-  .mini-label { display: none; }
+  .mini { display: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .mini { animation: none; } }
 
