@@ -26,9 +26,9 @@ const counts = Object.fromEntries(
           <span class="label track-num">{biNum(i + 1)}</span>
           <span class="track-title">{t.title}</span>
           <span class="track-meta">
-            <span class="label">{t.source}</span>
-            <span class="label">{t.chapter ?? t.categories.map((c) => c.toUpperCase()).join(" / ")}</span>
-            <span class="label">{t.duration}</span>
+            {t.source && <span class="label">{t.source}</span>}
+            {(t.chapter || t.categories.length > 0) && <span class="label chapters">{t.chapter || t.categories.map((c) => c.toUpperCase()).join(" / ")}</span>}
+            {t.duration && <span class="label">{t.duration}</span>}
           </span>
           <span class="track-toggle" aria-hidden="true">+</span>
         </button>
@@ -38,7 +38,7 @@ const counts = Object.fromEntries(
               {t.artwork && <div class="artwork" style={`background-image:url(${t.artwork})`}></div>}
               <div class="track-info">
                 {t.description && <p class="desc">{t.description}</p>}
-                <SoundCloud url={t.soundcloud} start={t.start} title={t.title} lazy />
+                {t.soundcloud && <SoundCloud url={t.soundcloud} start={t.start} title={t.title} lazy />}
                 <div class="track-actions">
                   {t.spotify && (
                     <a class="btn-line" href={t.spotify} target="_blank" rel="noopener">
@@ -245,6 +245,7 @@ const counts = Object.fromEntries(
     /** Play track i in the mini player, from `ms` (defaults to its timestamp). */
     const playTrack = (i: number, ms = data[i].start) => {
       const d = data[i];
+      if (!d?.url) return; // track has no SoundCloud link
       markCurrent(i);
       if (!active) {
         active = true;
@@ -280,8 +281,12 @@ const counts = Object.fromEntries(
 
     // Arrows walk the whole track list in order, whatever tab or rows are showing.
     const step = (dir: 1 | -1) => {
-      if (!rows.length) return;
-      playTrack(current < 0 ? 0 : (current + dir + rows.length) % rows.length);
+      // skip tracks without a SoundCloud link
+      const n = rows.length;
+      for (let k = 1, i = current < 0 ? (dir > 0 ? -1 : 0) : current; k <= n; k++) {
+        const j = (((i + dir * k) % n) + n) % n;
+        if (data[j].url) return playTrack(j);
+      }
     };
 
     mini.querySelector(".mini-prev")!.addEventListener("click", () => step(-1));

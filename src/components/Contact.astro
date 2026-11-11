@@ -3,7 +3,10 @@ import Ornament from "./Ornament.astro";
 import ArabicWordmark from "./ArabicWordmark.astro";
 import Icon from "./Icon.astro";
 import site from "../data/site.json";
-const { emails, links, copyright } = site.contact;
+const contact: any = (site as any).contact ?? {};
+const emails: string[] = (contact.emails ?? []).filter(Boolean);
+const links = (contact.links ?? []).filter((l: any) => l?.name);
+const copyright = contact.copyright;
 ---
 <section class="contact" id="contact">
   <span class="big-rosette"><Ornament kind="big-rosette" size={150} opacity={0.14} class="spin-slow" /></span>
@@ -14,18 +17,18 @@ const { emails, links, copyright } = site.contact;
       <span class="arabic muted">تواصل</span>
     </div>
     <div class="contact-cols">
-      <div class="reveal" style="--d:.1s">
+      {emails.length > 0 && <div class="reveal" style="--d:.1s">
         <span class="label col-label">EMAIL</span>
         {emails.map((e) => <a class="mail" href={`mailto:${e}`}>{e}</a>)}
-      </div>
-      <div class="reveal" style="--d:.2s">
+      </div>}
+      {links.length > 0 && <div class="reveal" style="--d:.2s">
         <span class="label col-label">ELSEWHERE</span>
         <div class="elsewhere">
-          {links.map(({ name, url }) => (
-            <a href={url} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={18} /></a>
+          {links.map(({ name, url }: any) => (
+            <a href={url || "#"} target="_blank" rel="noopener">{name} <Icon name="arrow-up-right" size={18} /></a>
           ))}
         </div>
-      </div>
+      </div>}
     </div>
     <footer class="footer reveal-fade">
       <div class="marks">
@@ -37,7 +40,7 @@ const { emails, links, copyright } = site.contact;
         <Ornament kind="star" size={14} opacity={0.7} />
         <Ornament kind="dot" size={5} opacity={0.4} />
       </div>
-      <span class="label muted">{copyright}</span>
+      {copyright ? <span class="label muted">{copyright}</span> : <span></span>}
     </footer>
   </div>
 </section>

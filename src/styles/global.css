@@ -328,7 +328,7 @@ body:has(.mini:not([hidden])) .contact .wrap { padding-bottom: 260px; }
   .track-toggle { grid-column: 3; grid-row: 1; align-self: center; }
   .track-meta { grid-column: 2 / 4; grid-row: 2; gap: 4px 14px; flex-wrap: wrap; }
   .track-meta .label { font-size: 11px; letter-spacing: .12em; }
-  .track-meta .label:nth-child(2) { display: none; }
+  .track-meta .chapters { display: none; }
   .track-head:hover { padding-left: 0; }
   .track.is-current .track-title::after { margin-left: 8px; }
   .track-details { flex-direction: column; align-items: stretch; gap: 20px; padding-bottom: 36px; }

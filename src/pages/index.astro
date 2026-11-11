@@ -10,30 +10,32 @@ import Icon from "../components/Icon.astro";
 import site from "../data/site.json";
 import gigData from "../data/gigs.json";
 
-const { hero, sound, about, live } = site;
-const { mix } = sound;
-const gigs = gigData.gigs;
+// Any field left empty in /admin is simply left out of the page.
+const { hero = {}, sound = {}, about = {}, live = {} } = site as any;
+const mix = sound.mix ?? {};
+const links = (hero.links ?? []).filter((l: any) => l?.name && l?.url);
+const gigs = ((gigData as any).gigs ?? []).filter((g: any) => g?.date || g?.name || g?.place);
 // Platform icon for a listen link, picked from its name (other names get no icon).
 const platformIcon = (name: string) =>
   /spotify/i.test(name) ? "spotify" : /soundcloud/i.test(name) ? "soundcloud" : /apple/i.test(name) ? "applemusic" : null;
 ---
-<Base title={site.seoTitle} description={site.seoDescription}>
+<Base title={site.seoTitle || "Nahawandi"} description={site.seoDescription || ""}>
   <!-- ───── Hero ───── -->
   <section class="hero">
     <div class="wrap">
       <div class="hero-meta reveal-fade">
-        <span class="side"><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">{hero.tagLeft}</span></span>
+        <span class="side">{hero.tagLeft && <><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">{hero.tagLeft}</span></>}</span>
         <span class="centre">
           <Ornament kind="star" size={14} opacity={0.7} />
           <ArabicWordmark width={106} />
           <Ornament kind="star" size={14} opacity={0.7} />
         </span>
-        <span class="side"><span class="label">{hero.tagRight}</span><Ornament kind="dot" size={8} opacity={0.7} /></span>
+        <span class="side">{hero.tagRight && <><span class="label">{hero.tagRight}</span><Ornament kind="dot" size={8} opacity={0.7} /></>}</span>
       </div>
 
-      <nav class="hero-listen reveal-fade" aria-label="Listen on">
+      {links.length > 0 && <nav class="hero-listen reveal-fade" aria-label="Listen on">
         <div class="hero-listen-links">
-          {hero.links.map(({ name, url }) => {
+          {links.map(({ name, url }: any) => {
             const brand = platformIcon(name);
             return (
               <a class="label" href={url} target="_blank" rel="noopener">
@@ -42,13 +44,13 @@ const platformIcon = (name: string) =>
             );
           })}
         </div>
-      </nav>
+      </nav>}
 
       <div class="hero-visual">
-        <div class="hero-photo reveal">
+        {hero.image && <div class="hero-photo reveal">
           <img src={hero.image} alt="Nahawandi" fetchpriority="high" />
           <span class="inner-arch"></span>
-        </div>
+        </div>}
         <div class="hero-stars" aria-hidden="true">
           <Ornament kind="star" size={18} class="twinkle" style="top:110px;left:70px;--o:.55" opacity={0.55} />
           <Ornament kind="dot" size={8} class="twinkle" style="top:250px;left:190px;--o:.6;--d:1.2s" opacity={0.6} />
@@ -60,9 +62,9 @@ const platformIcon = (name: string) =>
       </div>
 
       <div class="hero-bottom">
-        <p class="hero-copy muted reveal" style="--d:.2s">{hero.copy}</p>
+        {hero.copy ? <p class="hero-copy muted reveal" style="--d:.2s">{hero.copy}</p> : <span></span>}
         <div class="hero-cta reveal" style="--d:.35s">
-          <a class="enter" href="#sound"><span class="play-circle"><Icon name="play" size={18} /></span>{hero.cta}</a>
+          <a class="enter" href="#sound" aria-label={hero.cta || "Listen"}><span class="play-circle"><Icon name="play" size={18} /></span>{hero.cta}</a>
           <span class="label muted float scroll-hint">SCROLL <Icon name="arrow-down" size={12} /></span>
         </div>
       </div>
@@ -86,21 +88,21 @@ const platformIcon = (name: string) =>
           <Ornament kind="dot" size={8} opacity={0.7} />
           <Ornament kind="dot" size={5} opacity={0.4} />
         </div>
-        <span class="arabic reveal" style="--d:.05s">{sound.arabic}</span>
-        <h2 class="words">{sound.heading}</h2>
-        <p class="reveal" style="--d:.25s">{sound.intro}</p>
+        {sound.arabic && <span class="arabic reveal" style="--d:.05s">{sound.arabic}</span>}
+        {sound.heading && <h2 class="words">{sound.heading}</h2>}
+        {sound.intro && <p class="reveal" style="--d:.25s">{sound.intro}</p>}
       </div>
 
       <TrackBrowser />
 
-      <article class="liveset reveal">
-        <div class="liveset-head">
-          <span class="liveset-tag"><span class="live-dot" aria-hidden="true"></span><span class="label">{mix.eyebrow}</span></span>
-          <span class="label muted">{mix.meta}</span>
-        </div>
-        <h3>{mix.title}</h3>
-        <SoundCloud url={mix.soundcloud} title={mix.title} />
-      </article>
+      {(mix.soundcloud || mix.title) && <article class="liveset reveal">
+        {(mix.eyebrow || mix.meta) && <div class="liveset-head">
+          {mix.eyebrow ? <span class="liveset-tag"><span class="live-dot" aria-hidden="true"></span><span class="label">{mix.eyebrow}</span></span> : <span></span>}
+          {mix.meta && <span class="label muted">{mix.meta}</span>}
+        </div>}
+        {mix.title && <h3>{mix.title}</h3>}
+        {mix.soundcloud && <SoundCloud url={mix.soundcloud} title={mix.title || "Live set"} />}
+      </article>}
     </div>
   </section>
 
@@ -111,15 +113,15 @@ const platformIcon = (name: string) =>
     <div class="wrap">
       <div class="about-split">
         <div class="about-photo-col reveal">
-          <div class="arch-photo">
+          {about.image && <div class="arch-photo">
             <img src={about.image} alt="Qais — Nahawandi" loading="lazy" />
             <span class="inner-arch"></span>
-          </div>
-          <div class="caption">
+          </div>}
+          {(about.captionLeft || about.captionRight) && <div class="caption">
             <span class="label">{about.captionLeft}</span>
             <Ornament kind="star" size={13} opacity={0.6} />
             <span class="label">{about.captionRight}</span>
-          </div>
+          </div>}
         </div>
         <div class="about-copy-col">
           <div class="about-header reveal-fade">
@@ -135,10 +137,10 @@ const platformIcon = (name: string) =>
             </div>
           </div>
           <div class="about-copy">
-            <h2 class="words">{about.heading}</h2>
-            <p class="story reveal" style="--d:.1s">{about.story}</p>
-            <p class="maqam reveal" style="--d:.2s">{about.maqam}</p>
-            <a class="link-line reveal" style="--d:.3s" href="/biography/">{about.linkLabel}</a>
+            {about.heading && <h2 class="words">{about.heading}</h2>}
+            {about.story && <p class="story reveal" style="--d:.1s">{about.story}</p>}
+            {about.maqam && <p class="maqam reveal" style="--d:.2s">{about.maqam}</p>}
+            {about.linkLabel && <a class="link-line reveal" style="--d:.3s" href="/biography/">{about.linkLabel}</a>}
           </div>
         </div>
       </div>
@@ -152,24 +154,24 @@ const platformIcon = (name: string) =>
     <div class="wrap">
       <span class="bg-star" aria-hidden="true"><Ornament kind="star" size={70} opacity={0.12} class="spin-slow" /></span>
       <div class="archive-head">
-        <h2 class="display words">{live.heading}</h2>
-        <div class="right reveal-fade">
-          <span class="arabic">{live.arabic}</span>
-          <Ornament kind="star" size={13} opacity={0.6} />
-          <span class="label">{live.label}</span>
-        </div>
+        {live.heading ? <h2 class="display words">{live.heading}</h2> : <span></span>}
+        {(live.arabic || live.label) && <div class="right reveal-fade">
+          {live.arabic && <span class="arabic">{live.arabic}</span>}
+          {live.arabic && live.label && <Ornament kind="star" size={13} opacity={0.6} />}
+          {live.label && <span class="label">{live.label}</span>}
+        </div>}
       </div>
-      {gigs.map(({ date, name, place }, i) => (
+      {gigs.map(({ date, name, place }: any, i: number) => (
         <div class="gig reveal" style={`--d:${i * 0.08}s`}>
           <span class="date">{date}</span>
           <span class="name">{name}</span>
-          <span class="place"><Ornament kind="star" size={13} opacity={0.6} /><span class="label">{place}</span></span>
+          <span class="place">{place && <><Ornament kind="star" size={13} opacity={0.6} /><span class="label">{place}</span></>}</span>
         </div>
       ))}
-      <div class="live-cta reveal" style="--d:.2s">
-        <p class="muted">{live.ctaText}</p>
-        <a class="link-line" href="#contact">{live.ctaLabel}</a>
-      </div>
+      {(live.ctaText || live.ctaLabel) && <div class="live-cta reveal" style="--d:.2s">
+        {live.ctaText && <p class="muted">{live.ctaText}</p>}
+        {live.ctaLabel && <a class="link-line" href="#contact">{live.ctaLabel}</a>}
+      </div>}
     </div>
   </section>
 

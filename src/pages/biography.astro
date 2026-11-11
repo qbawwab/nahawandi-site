@@ -7,9 +7,10 @@ import Icon from "../components/Icon.astro";
 
 import bio from "../data/bio.json";
 
-const { lead, paragraphs } = bio;
+const lead: string = (bio as any).lead ?? "";
+const paragraphs: string[] = ((bio as any).paragraphs ?? []).filter(Boolean);
 ---
-<Base title="Biography — Nahawandi" description={lead} home={false}>
+<Base title="Biography — Nahawandi" description={lead || paragraphs[0] || ""} home={false}>
   <section class="letter">
     <div class="wrap">
       <article class="sheet reveal">
@@ -29,11 +30,11 @@ const { lead, paragraphs } = bio;
           <h1 class="words">Biography</h1>
           <span class="label muted reveal" style="--d:.3s">AMMAN · BREMEN</span>
           <span class="short-rule grow-x"></span>
-          <p class="lead reveal">{lead}</p>
-          <span class="short-rule grow-x"></span>
-          <div class="body">
+          {lead && <p class="lead reveal">{lead}</p>}
+          {lead && <span class="short-rule grow-x"></span>}
+          {paragraphs.length > 0 && <div class="body">
             {paragraphs.map((p) => <p class="reveal">{p}</p>)}
-          </div>
+          </div>}
           <span class="short-rule grow-x"></span>
           <div class="sign reveal">
             <span class="wordmark">NAHAWANDI</span>
