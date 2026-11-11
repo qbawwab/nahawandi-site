@@ -310,17 +310,27 @@ body:has(.mini:not([hidden])) .contact .wrap { padding-bottom: 260px; }
   .track-details { padding-left: 0; gap: 36px; }
   .artwork { flex-basis: 200px; height: 200px; }
   .track-meta { gap: 24px; }
+  .tabs { gap: 26px; }
+  .tab { gap: 10px; }
+  .tab .tab-name { font-size: 23px; }
 }
 @media (max-width: 809px) {
-  .tabs { gap: 24px; padding-top: 24px; }
-  .tab { gap: 10px; padding-bottom: 16px; }
-  .tab .tab-name { font-size: 21px; }
-  .track-head { flex-wrap: wrap; padding: 22px 0; gap: 8px 12px; }
-  .track-num { flex: 0 0 auto; }
-  .track-title { flex: 1 1 60%; order: 0; font-size: 22px; }
-  .track-meta { order: 3; width: 100%; gap: 4px 14px; flex-wrap: wrap; padding-left: 0; }
-  .track-meta .label { font-size: 12px; letter-spacing: .12em; }
+  /* Chapters as a 2 x 2 grid, so all four are visible without swiping */
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; padding-top: 16px; overflow: visible; }
+  .tab { gap: 8px; padding: 14px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: -1px; min-width: 0; }
+  .tab .label { display: none; }
+  .tab .tab-name { font-size: 20px; }
+  .tab .count { font-size: 11px; }
+  /* Rows: number | title | +, with one short line of details under the title */
+  .track-head { display: grid; grid-template-columns: 44px 1fr 22px; align-items: baseline; padding: 20px 0; gap: 6px 10px; }
+  .track-num { grid-column: 1; grid-row: 1; font-size: 11px; letter-spacing: .08em; }
+  .track-title { grid-column: 2; grid-row: 1; font-size: 21px; line-height: 1.2; }
+  .track-toggle { grid-column: 3; grid-row: 1; align-self: center; }
+  .track-meta { grid-column: 2 / 4; grid-row: 2; gap: 4px 14px; flex-wrap: wrap; }
+  .track-meta .label { font-size: 11px; letter-spacing: .12em; }
+  .track-meta .label:nth-child(2) { display: none; }
   .track-head:hover { padding-left: 0; }
+  .track.is-current .track-title::after { margin-left: 8px; }
   .track-details { flex-direction: column; align-items: stretch; gap: 20px; padding-bottom: 36px; }
   .artwork { display: none; }
   .track-info .desc { font-size: 15px; }
@@ -480,4 +490,17 @@ body:has(.mini:not([hidden])) .contact .wrap { padding-bottom: 260px; }
   .reveal, .reveal-fade, .words .w, .grow-x { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
   .hero-photo.reveal { transform: none !important; }
   .spin, .spin-slow, .twinkle, .float, .live-dot { animation: none !important; }
+}
+
+/* Small phones: keep everything inside the screen (no sideways scrolling) */
+@media (max-width: 809px) {
+  .hero-name { font-size: min(78px, calc((100vw - 40px) * .215)); }
+}
+@media (max-width: 370px) {
+  .hero-meta .label { font-size: 10.5px; letter-spacing: .06em; }
+  .hero-cta .enter { font-size: 12px; letter-spacing: .1em; }
+  .about-header .wordmark { font-size: 34px; }
+  .about-header .marks svg { width: 90px; height: auto; }
+  .footer .wordmark { font-size: 34px; }
+  .footer .marks svg { width: 90px; height: auto; }
 }
