@@ -10,7 +10,7 @@ import bio from "../data/bio.json";
 const lead: string = (bio as any).lead ?? "";
 const paragraphs: string[] = ((bio as any).paragraphs ?? []).filter(Boolean);
 ---
-<Base title="Biography — Nahawandi" description={lead || paragraphs[0] || ""} home={false}>
+<Base title="BIOGRAPHY | Nahawandi" description={lead || paragraphs[0] || ""} home={false}>
   <section class="letter">
     <div class="wrap">
       <article class="sheet reveal">
