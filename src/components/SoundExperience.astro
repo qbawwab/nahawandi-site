@@ -18,10 +18,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       <span class="label muted reveal-fade">{config.eyebrow}</span>
       <h1 class="sx-title wordmark">{config.title}</h1>
       <span class="label reveal-fade" style="--d:.2s">{config.subtitle}</span>
-      <div class="sx-start reveal" style="--d:.35s">
-        <button class="btn-line sx-enter" type="button"><Icon name="play" size={14} /><span class="sx-enter-text">ENTER WITH SOUND</span></button>
-        <button class="sx-silent label muted" type="button">BROWSE SILENTLY</button>
-      </div>
+      <button class="sx-tap label" type="button" hidden>TAP ANYWHERE FOR SOUND</button>
       <span class="label muted sx-hint reveal-fade" style="--d:.5s">HEADPHONES RECOMMENDED · SCROLL TO BUILD THE TRACK <Icon name="arrow-down" size={11} /></span>
     </div>
   </section>
@@ -57,7 +54,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     </div>
   </section>
 
-  <div class="sx-bar is-hidden" role="group" aria-label="Sound controls">
+  <div class="sx-bar" role="group" aria-label="Sound controls">
     <button class="sx-btn sx-sound" type="button" aria-pressed="false" aria-label="Sound on">
       <span class="v-on"><Icon name="volume" size={15} /></span><span class="v-off"><Icon name="mute" size={15} /></span>
     </button>
@@ -79,10 +76,10 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
   .sx-intro { min-height: calc(100svh - 110px); display: flex; align-items: center; }
   .sx-intro-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; padding-top: 60px; padding-bottom: 60px; }
   .sx-title { font-size: clamp(76px, 15vw, 300px); line-height: .9; letter-spacing: -.005em; }
-  .sx-start { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
-  .sx-enter { background: #000; }
-  .sx-silent { border-bottom: 1px solid rgba(255,255,255,.35); padding-bottom: 6px; transition: color .3s; }
-  .sx-silent:hover { color: #fff; }
+  .sx-tap { margin-top: 22px; border-bottom: 1px solid rgba(255,255,255,.4); padding-bottom: 6px; animation: sx-breathe 2.4s ease-in-out infinite; }
+  .sx-tap[hidden] { display: none; }
+  @keyframes sx-breathe { 50% { opacity: .45; } }
+  .sx-bar.is-blocked .sx-sound { animation: sx-breathe 1.6s ease-in-out infinite; }
   .sx-hint { margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; }
 
   .sx-stage { min-height: 170vh; display: flex; align-items: center; }
@@ -149,6 +146,8 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     // firstBeat = where the first downbeat falls in the files (seconds).
     const firstBeat: number = cfg.firstBeat || 0;
     const songDur: number = cfg.duration || 0;
+    // startAt = where playback starts (and loops back to) in the files, e.g. where the vocal comes in.
+    const startAt: number = cfg.startAt || 0;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const ids = stems.map((s) => s.id);
 
@@ -273,11 +272,13 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     }
     function startLoops(at: number) {
       sources.forEach((s) => { try { s.stop(); } catch {} });
+      // Every stem starts at the same offset at the same moment, so they stay locked together.
+      const L = songLen(), off = Math.min(startAt, L - 1);
       sources = stems.map((s, i) => {
         const src = ctx!.createBufferSource();
         src.buffer = buffers[i]; src.loop = true;
-        if (songDur && buffers[i].duration > songDur) src.loopEnd = songDur; // ignore encoder padding at the end
-        src.connect(gains[s.id]); src.start(at);
+        src.loopStart = off; src.loopEnd = L; // loop back to the start point, ignoring encoder padding at the end
+        src.connect(gains[s.id]); src.start(at, off);
         return src;
       });
       loopStart = at;
@@ -301,24 +302,48 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       })();
       return starting;
     }
+    // Sound starts by itself. Browsers may hold it back until the visitor's first
+    // tap or key press; then a prompt shows and that first interaction unlocks it.
+    const PREF = `nah:${cfg.slug || "sx"}:muted`;
+    function showBlocked(blocked: boolean) {
+      tapEl.hidden = !blocked;
+      bar.classList.toggle("is-blocked", blocked);
+    }
+    function unlock() {
+      if (!ctx || !soundOn || ctx.state !== "suspended" || document.hidden) return;
+      ctx.resume().then(() => showBlocked(false), () => {});
+    }
+    for (const ev of ["pointerdown", "pointerup", "touchend", "keydown", "click"]) addEventListener(ev, unlock, { passive: true });
     async function setSound(on: boolean) {
       soundOn = on;
+      try { localStorage.setItem(PREF, on ? "0" : "1"); } catch {}
       soundBtn.setAttribute("aria-pressed", String(on));
       soundBtn.setAttribute("aria-label", on ? "Mute" : "Sound on");
       if (on) {
         const loading = !buffers.length;
-        if (loading) { enterText.textContent = "LOADING…"; nowName.textContent = "LOADING…"; }
+        if (loading) nowName.textContent = "LOADING…";
         await initAudio();
-        if (loading) { enterText.textContent = "ENTER WITH SOUND"; lastStage = -2; }
-        if (ctx!.state === "suspended") await ctx!.resume();
+        if (loading) lastStage = -2;
+        if (!soundOn) return;
         applyMix(mixAt(position()));
         ramp(master.gain, 0.9, 0, 0.25);
-      } else if (ctx) ramp(master.gain, 0, 0, 0.15);
+        if (ctx!.state === "suspended") {
+          ctx!.resume().then(() => showBlocked(false), () => {});
+          setTimeout(() => showBlocked(!!ctx && ctx.state === "suspended" && soundOn), 350);
+        }
+      } else {
+        showBlocked(false);
+        if (ctx) ramp(master.gain, 0, 0, 0.15);
+      }
     }
     // The mix also follows scroll events directly (animation frames pause in background tabs).
     addEventListener("scroll", () => applyMix(mixAt(position())), { passive: true });
     const songLen = () => (songDur && buffers[0] ? Math.min(songDur, buffers[0].duration) : buffers[0]?.duration || loopDur);
-    const songPos = (now: number) => { const L = songLen(); return (((now - loopStart) % L) + L) % L; };
+    // Position in the files (seconds), taking the start point and looping into account.
+    const songPos = (now: number) => {
+      const L = songLen(), off = Math.min(startAt, L - 1), span = L - off;
+      return off + ((((now - loopStart) % span) + span) % span);
+    };
     function applyMix(mix: Mix) {
       if (!ctx || !soundOn) return;
       const now = ctx.currentTime;
@@ -331,10 +356,14 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
         if (Math.abs(target - applied[id]) < 0.01) continue;
         if (s.quantize && applied[id] <= 0.02 && target > 0.02) {
           // New rhythm layers come in on the next bar line of the song.
-          const pos = songPos(now), len = songLen();
-          let nb = firstBeat + Math.ceil((pos - firstBeat + 0.03) / barDur) * barDur;
-          if (nb >= len) nb = len + firstBeat;
-          const next = now + (nb - pos);
+          const pos = songPos(now), len = songLen(), off = Math.min(startAt, len - 1);
+          const nb = firstBeat + Math.ceil((pos - firstBeat + 0.03) / barDur) * barDur;
+          let wait = nb - pos;
+          if (nb >= len) { // the next bar line is after the loop point: use the first bar line after the restart
+            const nb2 = firstBeat + Math.ceil((off - firstBeat - 1e-6) / barDur) * barDur;
+            wait = len - pos + (nb2 - off);
+          }
+          const next = now + wait;
           ramp(p, target, next, 0.03);
           pending[id] = next;
         } else ramp(p, target, now, 0.35);
@@ -346,7 +375,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
 
     // ───── Controls ─────
     const soundBtn = root.querySelector<HTMLButtonElement>(".sx-sound")!;
-    const enterText = root.querySelector<HTMLElement>(".sx-enter-text")!;
+    const tapEl = root.querySelector<HTMLElement>(".sx-tap")!;
     const bar = root.querySelector<HTMLElement>(".sx-bar")!;
     const nowNum = root.querySelector<HTMLElement>(".sx-now-num")!;
     const nowName = root.querySelector<HTMLElement>(".sx-now-name")!;
@@ -354,9 +383,11 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     const firstStage = sections[0];
     const go = (el: Element | null) => el && el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
 
-    root.querySelector(".sx-enter")!.addEventListener("click", () => { setSound(true); go(firstStage); });
-    root.querySelector(".sx-silent")!.addEventListener("click", () => { setSound(false); go(firstStage); });
-    soundBtn.addEventListener("click", () => setSound(!soundOn));
+    soundBtn.addEventListener("click", () => {
+      // While the browser is still holding the sound back, this click just unlocks it.
+      if (soundOn && ctx && ctx.state === "suspended") return;
+      setSound(!soundOn);
+    });
     root.querySelector(".sx-restart")!.addEventListener("click", () => {
       go(firstStage);
       if (ctx && soundOn) { ramp(master.gain, 0, 0, 0.08); startLoops(ctx.currentTime + 0.3); setTimeout(() => soundOn && ramp(master.gain, 0.9, 0, 0.25), 320); }
@@ -388,7 +419,26 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,1,0,0],
       [1,0,1,0, 0,1,0,0, 1,0,1,0, 0,0,1,1],
     ];
-    const words = `${cfg.title || ""} · فيروز · `;
+    // Scattered stars (fixed positions), shown in growing numbers as the track gets denser.
+    const starRand = rng(4242);
+    const starPts = Array.from({ length: 30 }, () => ({ x: starRand(), y: starRand(), s: 7 + starRand() * 9, d: starRand() * 6.3 }));
+    // The site's eight-point star: two squares, one turned 45 degrees.
+    function star8(x: number, y: number, s: number, fill: boolean, rot = 0) {
+      g2.save(); g2.translate(x, y); g2.rotate(rot);
+      for (const r of [0, Math.PI / 4]) {
+        g2.save(); g2.rotate(r);
+        fill ? g2.fillRect(-s / 2, -s / 2, s, s) : g2.strokeRect(-s / 2, -s / 2, s, s);
+        g2.restore();
+      }
+      g2.restore();
+    }
+    // The site's rosette: four squares turned in 22.5 degree steps around a circle.
+    function rosette(x: number, y: number, s: number, rot: number) {
+      g2.save(); g2.translate(x, y); g2.rotate(rot);
+      for (let j = 0; j < 4; j++) { g2.save(); g2.rotate((j * Math.PI) / 8); g2.strokeRect(-s / 2, -s / 2, s, s); g2.restore(); }
+      g2.beginPath(); g2.arc(0, 0, s * 0.23, 0, Math.PI * 2); g2.stroke();
+      g2.restore();
+    }
 
     function arch(cx: number, base: number, r: number, h: number) {
       g2.beginPath(); g2.moveTo(cx - r, base); g2.lineTo(cx - r, base - h);
@@ -406,7 +456,6 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
         nowName.textContent = stages[si]?.label ?? "";
         dots.forEach((d, i) => d.classList.toggle("on", i === si));
       }
-      bar.classList.toggle("is-hidden", p < -0.2 || root!.querySelector(".sx-outro")!.getBoundingClientRect().top < innerHeight * 0.5);
 
       for (const id of ids) vis[id] += ((mix[id] ?? 0) - vis[id]) * (reduce ? 1 : 0.06);
       const v = vis.voice ?? 0, a = vis.pad ?? 0, r = vis.perc ?? 0, k = vis.kick ?? 0;
@@ -419,19 +468,15 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       g2.clearRect(0, 0, W, H);
       const m = Math.min(W, H), cx = W / 2;
 
-      // Typography turning into rhythm: rows of text, denser as the beat builds.
+      // Stars, as on the home page: more appear as the drums and bass build, twinkling slowly.
       const dens = Math.max(r * 0.6, k);
       if (dens > 0.01) {
-        const size = Math.max(28, m * 0.07), rows = Math.ceil(H / (size * 1.15)) + 1;
-        g2.font = `500 ${size}px Oswald, sans-serif`; g2.textBaseline = "top";
-        const tw = g2.measureText(words).width || 1;
-        for (let row = 0; row < rows; row++) {
-          const on = row % 2 === 0 || dens > 0.6;
-          if (!on) continue;
-          const dir = row % 2 ? 1 : -1, speed = 18 + (row % 3) * 10;
-          const off = (((dir * t * speed + row * 140) % tw) + tw) % tw;
-          g2.fillStyle = `rgba(255,255,255,${(0.035 + 0.05 * dens + 0.05 * pulse * (row % 2 ? 0 : 1)) * dens})`;
-          for (let x = -off; x < W; x += tw) g2.fillText(words, x, row * size * 1.15);
+        const count = Math.round(dens * starPts.length);
+        g2.lineWidth = 1;
+        for (let i = 0; i < count; i++) {
+          const s = starPts[i], tw = 0.5 + 0.5 * Math.sin(t * 0.7 + s.d);
+          g2.strokeStyle = `rgba(255,255,255,${(0.12 + 0.3 * tw) * dens})`;
+          star8(s.x * W, s.y * H, s.s, false, i % 3 ? 0 : t * 0.05);
         }
       }
 
@@ -462,24 +507,31 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
         }
       }
 
-      // Rhythm: a 16-step row; the evolution stage shifts the pattern every bar.
-      if (r > 0.01 || k > 0.01) {
-        const n = 16, gx = Math.max(24, W * 0.06), cw = (W - gx * 2) / n, y = H * 0.93, s = Math.min(cw * 0.55, 14);
+      // Rhythm: a circle of 16 steps (one bar), stars on the hits, the current step lit.
+      // In the evolution stage the pattern turns a step each bar.
+      const rl = Math.max(r, k);
+      if (rl > 0.01) {
+        const n = 16, R = m * 0.34, cy = H * 0.5;
         const barIx = Math.floor(beat / 4), stepIx = Math.floor(beat * 4) % n;
         const pat = patterns[evo > 0.1 ? barIx % 2 : 0], shift = evo > 0.1 ? barIx % 4 : 0;
+        const turn = evo > 0.1 ? (barIx % 16) * (Math.PI / 8) * 0.25 : 0;
+        g2.strokeStyle = `rgba(255,255,255,${0.1 * rl})`; g2.lineWidth = 1;
+        g2.beginPath(); g2.arc(cx, cy, R, 0, Math.PI * 2); g2.stroke();
         for (let i = 0; i < n; i++) {
-          const hit = pat[(i + shift) % n] || i % 4 === 0;
-          const cur = !reduce && i === stepIx;
-          g2.fillStyle = `rgba(255,255,255,${Math.max(r, k) * (cur ? 1 : hit ? 0.45 : 0.1)})`;
-          const x = gx + i * cw + (cw - s) / 2;
-          if (i % 4 === 0) g2.fillRect(x, y - s / 2, s, s); else { g2.beginPath(); g2.arc(x + s / 2, y, s / 3, 0, Math.PI * 2); g2.fill(); }
+          const ang = -Math.PI / 2 + (i * 2 * Math.PI) / n + turn;
+          const x = cx + Math.cos(ang) * R, y = cy + Math.sin(ang) * R;
+          const hit = pat[(i + shift) % n] || i % 4 === 0, cur = !reduce && i === stepIx;
+          const al = rl * (cur ? 1 : hit ? 0.5 : 0.18);
+          g2.fillStyle = `rgba(255,255,255,${al})`; g2.strokeStyle = `rgba(255,255,255,${al})`;
+          if (hit) star8(x, y, cur ? 11 : 8, cur, ang);
+          else { g2.beginPath(); g2.arc(x, y, cur ? 3 : 1.6, 0, Math.PI * 2); g2.fill(); }
         }
       }
 
-      // Kick: a thin horizontal pulse.
-      if (pulse > 0.02) {
-        g2.fillStyle = `rgba(255,255,255,${0.25 * pulse})`;
-        g2.fillRect(0, H * 0.5 - 0.5, W, 1);
+      // Kick: the rosette at the centre, swelling on every beat.
+      if (k > 0.01) {
+        g2.strokeStyle = `rgba(255,255,255,${0.16 * k + 0.35 * pulse})`; g2.lineWidth = 1;
+        rosette(cx, H * 0.5, m * 0.13 * (1 + 0.1 * pulse), t * 0.04);
       }
       if (!reduce || ms === 0) requestAnimationFrame(frame);
     }
@@ -488,5 +540,10 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       const draw = () => frame(0);
       addEventListener("scroll", draw, { passive: true }); draw();
     } else requestAnimationFrame(frame);
+
+    // Start the sound straight away, unless the visitor muted it last time.
+    let wantSound = true;
+    try { wantSound = localStorage.getItem(PREF) !== "1"; } catch {}
+    setSound(wantSound);
   }
 </script>
