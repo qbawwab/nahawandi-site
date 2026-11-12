@@ -527,3 +527,62 @@ body:has(.mini:not([hidden])) .contact .wrap { padding-bottom: 260px; }
   .footer .wordmark { font-size: 34px; }
   .footer .marks svg { width: 90px; height: auto; }
 }
+
+/* ───────── Wide screens: fill the window instead of a centred column ─────────
+   From 1400px up the content spans the full width (margins grow with the
+   screen) and the type and photos grow with it, so the page keeps the same
+   proportions as the design. Each size is the desktop size at 1400px and
+   stops growing at about 1.7x. */
+@media (min-width: 1400px) {
+  :root { --gutter: clamp(52px, 4.4vw, 120px); }
+  .wrap { max-width: none; }
+  .label { font-size: clamp(15px, 1.07vw, 26px); }
+  .display { font-size: clamp(104px, 7.43vw, 177px); }
+  .nav .logo { font-size: clamp(36px, 2.57vw, 61px); }
+  .nav-links { gap: clamp(22px, 1.6vw, 37px); }
+  .nav-links a { font-size: clamp(13px, .93vw, 22px); }
+  .btn-outline { font-size: clamp(13px, .93vw, 22px); }
+
+  .hero .wrap { padding-top: clamp(80px, 5.7vw, 136px); padding-bottom: clamp(90px, 6.4vw, 153px); }
+  .hero-visual { height: clamp(770px, 55vw, 1309px); }
+  .hero-photo { height: clamp(672px, 48vw, 1142px); width: min(75%, clamp(897px, 64vw, 1525px)); }
+  .hero-name { font-size: clamp(212px, 15.1vw, 360px); }
+  .hero-copy { font-size: clamp(29px, 2.07vw, 49px); max-width: clamp(600px, 43vw, 1020px); }
+  .hero-cta .enter { font-size: clamp(18px, 1.29vw, 31px); }
+  .play-circle { width: clamp(70px, 5vw, 119px); height: clamp(70px, 5vw, 119px); }
+
+  .sound > .wrap { padding-top: clamp(112px, 8vw, 190px); padding-bottom: clamp(120px, 8.6vw, 204px); gap: clamp(64px, 4.6vw, 109px); }
+  .sound-intro .arabic { font-size: clamp(46px, 3.3vw, 78px); }
+  .sound-intro h2 { font-size: clamp(60px, 4.3vw, 102px); }
+  .sound-intro p { font-size: clamp(20px, 1.43vw, 34px); }
+  .tab .tab-name { font-size: clamp(27px, 1.93vw, 46px); }
+  .tabs { gap: clamp(40px, 2.9vw, 68px); }
+  .track-head { padding: clamp(32px, 2.3vw, 54px) 0; }
+  .track-num { flex-basis: clamp(92px, 6.6vw, 156px); }
+  .track-title { font-size: clamp(28px, 2vw, 48px); }
+  .track-meta { gap: clamp(42px, 3vw, 71px); }
+  .track-details { padding-left: clamp(108px, 7.7vw, 184px); }
+  .artwork { flex-basis: clamp(240px, 17vw, 408px); height: clamp(240px, 17vw, 408px); }
+  .track-info .desc { font-size: clamp(16px, 1.14vw, 27px); }
+  .liveset h3 { font-size: clamp(104px, 7.43vw, 177px); }
+
+  .about .wrap { padding-bottom: clamp(120px, 8.6vw, 204px); }
+  .about-split { gap: clamp(90px, 6.4vw, 153px); }
+  .arch-photo { height: clamp(680px, 48.6vw, 1156px); }
+  .about-header .wordmark { font-size: clamp(44px, 3.14vw, 75px); }
+  .about-copy h2 { font-size: clamp(64px, 4.57vw, 109px); }
+  .about-copy .story { font-size: clamp(26px, 1.86vw, 44px); }
+  .about-copy .maqam { font-size: clamp(20px, 1.43vw, 34px); }
+  .link-line { font-size: clamp(16px, 1.14vw, 27px); }
+
+  .archive .wrap { padding-top: clamp(90px, 6.4vw, 153px); padding-bottom: clamp(90px, 6.4vw, 153px); }
+  .gig { padding: clamp(40px, 2.9vw, 68px) 0; }
+  .gig .date { flex-basis: clamp(330px, 23.6vw, 561px); font-size: clamp(16px, 1.14vw, 27px); }
+  .gig .name { font-size: clamp(44px, 3.14vw, 75px); }
+  .live-cta p { font-size: clamp(24px, 1.71vw, 41px); }
+
+  .contact .wrap { padding-top: clamp(144px, 10.3vw, 245px); }
+  .mail { font-size: clamp(33px, 2.36vw, 56px); }
+  .elsewhere a { font-size: clamp(30px, 2.14vw, 51px); }
+  .footer .wordmark { font-size: clamp(42px, 3vw, 71px); }
+}
