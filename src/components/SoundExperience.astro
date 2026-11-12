@@ -19,7 +19,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       <h1 class="sx-title wordmark">{config.title}</h1>
       <span class="label reveal-fade" style="--d:.2s">{config.subtitle}</span>
       <div class="sx-start reveal" style="--d:.35s">
-        <button class="btn-line sx-enter" type="button"><Icon name="play" size={14} />ENTER WITH SOUND</button>
+        <button class="btn-line sx-enter" type="button"><Icon name="play" size={14} /><span class="sx-enter-text">ENTER WITH SOUND</span></button>
         <button class="sx-silent label muted" type="button">BROWSE SILENTLY</button>
       </div>
       <span class="label muted sx-hint reveal-fade" style="--d:.5s">HEADPHONES RECOMMENDED · SCROLL TO BUILD THE TRACK <Icon name="arrow-down" size={11} /></span>
@@ -145,6 +145,10 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     const stages: any[] = cfg.stages ?? [];
     const bpm: number = cfg.bpm || 120;
     const beatDur = 60 / bpm, barDur = beatDur * 4, loopDur = barDur * (cfg.bars || 4);
+    // Real stems: all start together and loop at the song's exact length.
+    // firstBeat = where the first downbeat falls in the files (seconds).
+    const firstBeat: number = cfg.firstBeat || 0;
+    const songDur: number = cfg.duration || 0;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const ids = stems.map((s) => s.id);
 
@@ -271,7 +275,9 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       sources.forEach((s) => { try { s.stop(); } catch {} });
       sources = stems.map((s, i) => {
         const src = ctx!.createBufferSource();
-        src.buffer = buffers[i]; src.loop = true; src.connect(gains[s.id]); src.start(at);
+        src.buffer = buffers[i]; src.loop = true;
+        if (songDur && buffers[i].duration > songDur) src.loopEnd = songDur; // ignore encoder padding at the end
+        src.connect(gains[s.id]); src.start(at);
         return src;
       });
       loopStart = at;
@@ -300,7 +306,10 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
       soundBtn.setAttribute("aria-pressed", String(on));
       soundBtn.setAttribute("aria-label", on ? "Mute" : "Sound on");
       if (on) {
+        const loading = !buffers.length;
+        if (loading) { enterText.textContent = "LOADING…"; nowName.textContent = "LOADING…"; }
         await initAudio();
+        if (loading) { enterText.textContent = "ENTER WITH SOUND"; lastStage = -2; }
         if (ctx!.state === "suspended") await ctx!.resume();
         applyMix(mixAt(position()));
         ramp(master.gain, 0.9, 0, 0.25);
@@ -308,6 +317,8 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     }
     // The mix also follows scroll events directly (animation frames pause in background tabs).
     addEventListener("scroll", () => applyMix(mixAt(position())), { passive: true });
+    const songLen = () => (songDur && buffers[0] ? Math.min(songDur, buffers[0].duration) : buffers[0]?.duration || loopDur);
+    const songPos = (now: number) => { const L = songLen(); return (((now - loopStart) % L) + L) % L; };
     function applyMix(mix: Mix) {
       if (!ctx || !soundOn) return;
       const now = ctx.currentTime;
@@ -319,8 +330,11 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
         }
         if (Math.abs(target - applied[id]) < 0.01) continue;
         if (s.quantize && applied[id] <= 0.02 && target > 0.02) {
-          // New rhythm layers come in on the next bar line.
-          const next = loopStart + Math.ceil((now - loopStart + 0.03) / barDur) * barDur;
+          // New rhythm layers come in on the next bar line of the song.
+          const pos = songPos(now), len = songLen();
+          let nb = firstBeat + Math.ceil((pos - firstBeat + 0.03) / barDur) * barDur;
+          if (nb >= len) nb = len + firstBeat;
+          const next = now + (nb - pos);
           ramp(p, target, next, 0.03);
           pending[id] = next;
         } else ramp(p, target, now, 0.35);
@@ -332,6 +346,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
 
     // ───── Controls ─────
     const soundBtn = root.querySelector<HTMLButtonElement>(".sx-sound")!;
+    const enterText = root.querySelector<HTMLElement>(".sx-enter-text")!;
     const bar = root.querySelector<HTMLElement>(".sx-bar")!;
     const nowNum = root.querySelector<HTMLElement>(".sx-now-num")!;
     const nowName = root.querySelector<HTMLElement>(".sx-now-name")!;
@@ -356,7 +371,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
     });
 
     // For checking the mixer from the browser console.
-    (window as any).sxState = () => ({ audio: ctx?.state, soundOn, position: +position().toFixed(2), gains: { ...applied }, waitingForBar: { ...pending } });
+    (window as any).sxState = () => ({ audio: ctx?.state, now: ctx?.currentTime, soundOn, songTime: ctx && buffers.length ? +songPos(ctx.currentTime).toFixed(3) : null, files: buffers.map((b) => +b.duration.toFixed(3)), sources: sources.length, position: +position().toFixed(2), gains: { ...applied }, waitingForBar: { ...pending } });
 
     // ───── Visuals ─────
     const canvas = root.querySelector<HTMLCanvasElement>(".sx-canvas")!;
@@ -395,7 +410,7 @@ const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+
 
       for (const id of ids) vis[id] += ((mix[id] ?? 0) - vis[id]) * (reduce ? 1 : 0.06);
       const v = vis.voice ?? 0, a = vis.pad ?? 0, r = vis.perc ?? 0, k = vis.kick ?? 0;
-      const t = reduce ? 0 : ctx && soundOn ? ctx.currentTime - loopStart : ms / 1000;
+      const t = reduce ? 0 : ctx && soundOn && buffers.length ? Math.max(0, songPos(ctx.currentTime) - firstBeat) : ms / 1000;
       const beat = t / beatDur, ph = ((beat % 1) + 1) % 1;
       const pulse = reduce ? 0 : Math.exp(-ph * 7) * k;
       const evo = Math.max(0, Math.min(1, p - (stages.length - 1)));
