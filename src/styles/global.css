@@ -150,26 +150,44 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .hero-name { font-size: 150px; }
   .hero-copy { font-size: 24px; }
 }
+.phone-br { display: none; }
+/* Phones: one centred column. Photo, name, tag | Arabic mark, city between lines,
+   intro, then the streaming links as a divided row. */
 @media (max-width: 809px) {
-  .hero .wrap { padding-top: 40px; padding-bottom: 72px; }
+  .nav { border-bottom-color: transparent; }
+  .nav .wrap { position: relative; }
+  .nav .wrap::after { content: ""; position: absolute; left: var(--gutter); right: var(--gutter); bottom: 0; height: 1px; background: rgba(255, 255, 255, .22); }
+
+  .hero .wrap { display: grid; grid-template-columns: 1fr auto auto 1fr; padding-top: 22px; padding-bottom: 56px; }
+  .hero-meta, .hero-bottom { display: contents; }
   .hero-meta .side .orn, .hero-meta .centre .orn { display: none; }
-  .hero-meta .wordmark-ar { width: 70px; height: 40px; }
-  .hero-meta .label { font-size: 11.5px; letter-spacing: .1em; white-space: nowrap; }
-  .hero-meta .side:first-child .label { white-space: normal; max-width: 9em; line-height: 1.6; }
-  .hero-listen { height: auto; margin-top: 28px; }
-  .hero-listen-links { position: static; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 12px 22px; }
-  .hero-listen a { font-size: 12px; letter-spacing: .12em; gap: 5px; }
-  .hero-visual { height: 430px; margin-top: 8px; }
-  .hero-photo { width: 100%; height: 350px; top: 36px; }
-  .hero-name { font-size: 78px; left: -2px; }
+
+  .hero-visual { grid-row: 1; grid-column: 1 / -1; height: auto; margin: 0; display: flex; flex-direction: column; align-items: center; }
+  .hero-photo { position: relative; top: auto; right: auto; width: min(73vw, 400px); height: auto; aspect-ratio: 69 / 74; }
+  .hero-photo.reveal { transform-origin: center bottom; }
   .hero-stars { display: none; }
-  .hero-bottom { flex-direction: column; align-items: flex-start; gap: 44px; padding-top: 36px; }
-  .hero-copy { font-size: 20px; line-height: 1.55; }
-  .hero-cta, .hero-cta .enter { gap: 18px; }
-  .play-circle { width: 56px; height: 56px; }
-  .play-circle .icon { width: 16px; height: 16px; margin-left: 2px; }
-  .hero-cta .enter { font-size: 13.5px; letter-spacing: .14em; white-space: nowrap; }
-  .hero-cta .scroll-hint { display: none; }
+  .hero-name { position: relative; left: auto; bottom: auto; margin-top: -.42em; text-align: center; font-size: calc((100vw - 48px) * .19); }
+
+  .hero-meta .side:first-child { grid-row: 2; grid-column: 2; justify-content: flex-end; padding: 2px 20px 2px 0; margin-top: 22px; }
+  .hero-meta .side:first-child .label { white-space: nowrap; line-height: 1.75; }
+  .hero-meta .tag-sep { display: none; }
+  .phone-br { display: inline; }
+  .hero-meta .centre { grid-row: 2; grid-column: 3; padding-left: 20px; margin-top: 22px; border-left: 1px solid rgba(255, 255, 255, .3); }
+  .hero-meta .wordmark-ar { width: 78px; height: 45px; }
+  .hero-meta .label { font-size: 11px; letter-spacing: .13em; }
+  .hero-meta .side:last-child { grid-row: 3; grid-column: 1 / -1; justify-self: center; width: 84%; display: flex; align-items: center; gap: 18px; margin-top: 24px; }
+  .hero-meta .side:last-child::before, .hero-meta .side:last-child::after { content: ""; flex: 1; height: 1px; background: rgba(255, 255, 255, .3); }
+  .hero-meta .side:last-child .label { white-space: nowrap; }
+
+  .hero-copy { grid-row: 4; grid-column: 1 / -1; justify-self: center; max-width: 21em; margin-top: 22px; text-align: center; font-size: 17px; line-height: 1.5; color: #d9d9d9; }
+  .hero-cta { display: none; }
+
+  .hero-listen { grid-row: 5; grid-column: 1 / -1; height: auto; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, .22); }
+  .hero-listen-links { position: static; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 0; }
+  .hero-listen a { flex: 1 1 auto; justify-content: center; padding: 6px 2px; font-size: 10px; letter-spacing: .07em; gap: 5px; white-space: nowrap; color: #d6d6d6; }
+  .hero-listen a .icon:not(.platform) { width: 9px; height: 9px; }
+  .hero-listen a + a { border-left: 1px solid rgba(255, 255, 255, .25); }
+  .hero-listen .platform { width: 14px; height: 14px; }
 }
 
 /* ───────── Ornament divider ───────── */
@@ -497,11 +515,13 @@ body:has(.mini:not([hidden])) .contact .wrap { padding-bottom: 260px; }
 
 /* Small phones: keep everything inside the screen (no sideways scrolling) */
 @media (max-width: 809px) {
-  .hero-name { font-size: min(78px, calc((100vw - 48px) * .215)); }
+  .hero-name { font-size: calc((100vw - 48px) * .19); }
 }
 @media (max-width: 370px) {
   .hero-meta .label { font-size: 10.5px; letter-spacing: .06em; }
   .hero-cta .enter { font-size: 12px; letter-spacing: .1em; }
+  .hero-listen a { font-size: 9.5px; letter-spacing: .04em; gap: 4px; }
+  .hero-listen a .icon:not(.platform) { display: none; }
   .about-header .wordmark { font-size: 34px; }
   .about-header .marks svg { width: 90px; height: auto; }
   .footer .wordmark { font-size: 34px; }

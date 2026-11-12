@@ -15,6 +15,9 @@ const { hero = {}, sound = {}, about = {}, live = {} } = site as any;
 const mix = sound.mix ?? {};
 const links = (hero.links ?? []).filter((l: any) => l?.name && l?.url);
 const gigs = ((gigData as any).gigs ?? []).filter((g: any) => g?.date || g?.name || g?.place);
+// On phones the left tag breaks onto two lines at its first " · ".
+const [tagHead, ...tagRest] = String(hero.tagLeft ?? "").split(" · ");
+const tagTail = tagRest.join(" · ");
 // Platform icon for a listen link, picked from its name (other names get no icon).
 const platformIcon = (name: string) =>
   /spotify/i.test(name) ? "spotify" : /soundcloud/i.test(name) ? "soundcloud" : /apple/i.test(name) ? "applemusic" : null;
@@ -24,7 +27,7 @@ const platformIcon = (name: string) =>
   <section class="hero">
     <div class="wrap">
       <div class="hero-meta reveal-fade">
-        <span class="side">{hero.tagLeft && <><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">{hero.tagLeft}</span></>}</span>
+        <span class="side">{hero.tagLeft && <><Ornament kind="dot" size={8} opacity={0.7} /><span class="label">{tagHead}{tagTail && <><span class="tag-sep"> · </span><br class="phone-br" />{tagTail}</>}</span></>}</span>
         <span class="centre">
           <Ornament kind="star" size={14} opacity={0.7} />
           <ArabicWordmark width={106} />
