@@ -1,0 +1,72 @@
+{
+  "slug": "al-bosta",
+  "seoTitle": "AL BOSTA | Nahawandi",
+  "seoDescription": "Fairuz, Al Bosta, reworked by Nahawandi. A sound experience that builds as you scroll.",
+  "eyebrow": "A SOUND EXPERIENCE",
+  "title": "AL BOSTA",
+  "subtitle": "FAIRUZ · REWORK BY NAHAWANDI",
+  "bpm": 120,
+  "bars": 4,
+  "stems": [
+    { "id": "voice", "name": "Voice", "src": "", "placeholder": "voice" },
+    { "id": "pad", "name": "Atmosphere", "src": "", "placeholder": "pad" },
+    { "id": "perc", "name": "Percussion", "src": "", "placeholder": "perc", "quantize": true },
+    { "id": "kick", "name": "Kick & bass", "src": "", "placeholder": "kick", "quantize": true }
+  ],
+  "stages": [
+    {
+      "key": "source",
+      "label": "THE SOURCE",
+      "title": "Some voices need no introduction.",
+      "arabic": "فيروز",
+      "text": [
+        "But for those who don’t know her… Fairuz.",
+        "For generations across the Arab world, her voice has been part of mornings, car rides, homes and everyday life."
+      ],
+      "figure": { "image": "", "placeholder": "ORIGINAL ARTWORK · ADD A CLEARED IMAGE" },
+      "mix": { "voice": 1, "pad": 0, "perc": 0, "kick": 0, "filter": 3200 }
+    },
+    {
+      "key": "foundation",
+      "label": "THE FOUNDATION",
+      "title": "The original already carries movement in it.",
+      "text": [
+        "Atmosphere gathers around her voice, one layer at a time. The voice stays at the centre."
+      ],
+      "mix": { "voice": 1, "pad": 0.8, "perc": 0, "kick": 0, "filter": 20000 }
+    },
+    {
+      "key": "rhythm",
+      "label": "THE RHYTHM",
+      "title": "I wanted to push that movement further.",
+      "text": [
+        "Percussion first, then kick and bass, each one arriving on the bar."
+      ],
+      "mix": { "voice": 0.9, "pad": 0.7, "perc": 0.8, "kick": 0, "filter": 20000 },
+      "mixEnd": { "voice": 0.9, "pad": 0.7, "perc": 0.85, "kick": 0.95, "filter": 20000 }
+    },
+    {
+      "key": "experience",
+      "label": "THE EXPERIENCE",
+      "title": "This is my rework of Al Bosta.",
+      "text": [
+        "Pushing the movement further, while keeping her voice at the centre."
+      ],
+      "figure": { "image": "/images/mix.jpg", "alt": "Nahawandi playing live" },
+      "mix": { "voice": 1, "pad": 0.85, "perc": 0.9, "kick": 1, "filter": 20000 }
+    },
+    {
+      "key": "evolution",
+      "label": "THE EVOLUTION",
+      "title": "You don’t need to understand every word to understand the feeling.",
+      "text": [
+        "The arrangement breaks down to her voice, then builds back up, the way it can move in a live set."
+      ],
+      "mix": { "voice": 1, "pad": 0.9, "perc": 0.25, "kick": 0, "filter": 20000 },
+      "mixEnd": { "voice": 1, "pad": 1, "perc": 1, "kick": 1, "filter": 20000 }
+    }
+  ],
+  "links": [
+    { "name": "Back to the Sound Archive", "url": "/#sound" }
+  ]
+}

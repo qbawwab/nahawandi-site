@@ -1,0 +1,9 @@
+---
+import Base from "../layouts/Base.astro";
+import SoundExperience from "../components/SoundExperience.astro";
+// Text, stages and audio files are set in src/data/al-bosta.json.
+import config from "../data/al-bosta.json";
+---
+<Base title={config.seoTitle} description={config.seoDescription} home={false}>
+  <SoundExperience config={config} />
+</Base>

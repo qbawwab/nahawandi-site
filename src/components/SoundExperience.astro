@@ -1,0 +1,477 @@
+---
+// A scroll-driven sound experience: the page is split into stages, and each
+// stage sets a mix of looped stems. Scrolling blends between the mixes, so the
+// track builds (and un-builds when scrolling back). Any stem without a file
+// gets a generated placeholder loop, so the page works before the real audio exists.
+import Icon from "./Icon.astro";
+import ArabicWordmark from "./ArabicWordmark.astro";
+const { config } = Astro.props as { config: any };
+const stages: any[] = config.stages ?? [];
+const nums = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+const ar = (n: number) => String(n).padStart(2, "0").split("").map((d) => nums[+d]).join("");
+---
+<div class="sx" data-config={JSON.stringify(config)}>
+  <canvas class="sx-canvas" aria-hidden="true"></canvas>
+
+  <section class="sx-intro">
+    <div class="wrap sx-intro-inner">
+      <span class="label muted reveal-fade">{config.eyebrow}</span>
+      <h1 class="sx-title wordmark">{config.title}</h1>
+      <span class="label reveal-fade" style="--d:.2s">{config.subtitle}</span>
+      <div class="sx-start reveal" style="--d:.35s">
+        <button class="btn-line sx-enter" type="button"><Icon name="play" size={14} />ENTER WITH SOUND</button>
+        <button class="sx-silent label muted" type="button">BROWSE SILENTLY</button>
+      </div>
+      <span class="label muted sx-hint reveal-fade" style="--d:.5s">HEADPHONES RECOMMENDED · SCROLL TO BUILD THE TRACK <Icon name="arrow-down" size={11} /></span>
+    </div>
+  </section>
+
+  {stages.map((s, i) => (
+    <section class={`sx-stage sx-${s.key}`} data-i={i} id={`stage-${s.key}`}>
+      <div class={`wrap sx-row ${i % 2 ? "right" : ""}`}>
+        <div class="sx-card">
+          <div class="sx-num label"><span>{String(i + 1).padStart(2, "0")} · {ar(i + 1)}</span><span class="sx-rule"></span><span>{s.label}</span></div>
+          {s.arabic && <span class="sx-arabic arabic">{s.arabic}</span>}
+          <h2 class="sx-h">{s.title}</h2>
+          {(s.text ?? []).map((p: string) => <p class="sx-p">{p}</p>)}
+        </div>
+        {s.figure && (
+          <figure class="sx-figure">
+            {s.figure.image
+              ? <img src={s.figure.image} alt={s.figure.alt || ""} loading="lazy" />
+              : <span class="sx-ph label">{s.figure.placeholder}</span>}
+            <span class="inner-arch"></span>
+          </figure>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="sx-outro">
+    <div class="wrap sx-outro-inner">
+      <ArabicWordmark width={120} />
+      <span class="label muted">{config.subtitle}</span>
+      <div class="sx-links">
+        {(config.links ?? []).filter((l: any) => l?.url).map((l: any) => <a class="link-line" href={l.url}>{l.name}</a>)}
+      </div>
+    </div>
+  </section>
+
+  <div class="sx-bar is-hidden" role="group" aria-label="Sound controls">
+    <button class="sx-btn sx-sound" type="button" aria-pressed="false" aria-label="Sound on">
+      <span class="v-on"><Icon name="volume" size={15} /></span><span class="v-off"><Icon name="mute" size={15} /></span>
+    </button>
+    <div class="sx-now">
+      <span class="sx-now-num label"></span>
+      <span class="sx-now-name label"></span>
+    </div>
+    <div class="sx-dots" aria-hidden="true">{stages.map(() => <span></span>)}</div>
+    <button class="sx-btn sx-restart" type="button" aria-label="Restart"><Icon name="prev" size={13} /></button>
+    <button class="sx-btn sx-skip" type="button" aria-label="Next stage"><Icon name="next" size={13} /></button>
+  </div>
+</div>
+
+<style>
+  .sx { position: relative; }
+  .sx-canvas { position: sticky; top: 0; display: block; width: 100%; height: 100vh; height: 100svh; margin-bottom: -100vh; margin-bottom: -100svh; pointer-events: none; }
+  .sx-intro, .sx-stage, .sx-outro { position: relative; z-index: 1; }
+
+  .sx-intro { min-height: calc(100svh - 110px); display: flex; align-items: center; }
+  .sx-intro-inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; padding-top: 60px; padding-bottom: 60px; }
+  .sx-title { font-size: clamp(76px, 15vw, 300px); line-height: .9; letter-spacing: -.005em; }
+  .sx-start { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
+  .sx-enter { background: #000; }
+  .sx-silent { border-bottom: 1px solid rgba(255,255,255,.35); padding-bottom: 6px; transition: color .3s; }
+  .sx-silent:hover { color: #fff; }
+  .sx-hint { margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; }
+
+  .sx-stage { min-height: 170vh; display: flex; align-items: center; }
+  .sx-row { display: flex; align-items: center; justify-content: space-between; gap: 6vw; }
+  .sx-row.right { flex-direction: row-reverse; }
+  .sx-card { max-width: 620px; background: rgba(0,0,0,.72); padding: 40px 0; box-shadow: 0 0 80px 60px rgba(0,0,0,.72); }
+  .sx-num { display: flex; align-items: center; gap: 14px; color: var(--muted); }
+  .sx-rule { width: 48px; height: 1px; background: rgba(255,255,255,.35); }
+  .sx-arabic { display: block; font-size: clamp(64px, 8vw, 140px); line-height: 1.25; margin-top: 18px; }
+  .sx-h { font-style: italic; font-size: clamp(36px, 3.6vw, 64px); line-height: 1.12; letter-spacing: -.01em; margin-top: 22px; }
+  .sx-p { font-size: clamp(19px, 1.5vw, 26px); line-height: 1.55; color: #cfcfcf; margin-top: 20px; }
+  .sx-figure { position: relative; margin: 0; flex: 0 0 min(34vw, 520px); aspect-ratio: 3 / 4; border-radius: 9999px 9999px 0 0; overflow: hidden; background: #0b0b0b; }
+  .sx-figure img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); }
+  .sx-ph { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 22%; text-align: center; color: var(--muted); font-size: 12px; border: 1px dashed rgba(255,255,255,.3); border-radius: inherit; }
+
+  .sx-outro { min-height: 80vh; display: flex; align-items: center; }
+  .sx-outro-inner { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; padding-bottom: 120px; }
+  .sx-links { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+
+  .sx-bar {
+    position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 30;
+    display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 8px;
+    background: rgba(17,17,17,.9); border: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(8px);
+    transition: opacity .4s, transform .4s var(--ease);
+  }
+  .sx-bar.is-hidden { opacity: 0; transform: translate(-50%, 20px); pointer-events: none; }
+  .sx-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; transition: background .3s, color .3s; flex: none; }
+  .sx-btn:hover { background: #fff; color: #000; }
+  .sx-btn .icon { vertical-align: 0; display: block; }
+  .sx-sound .v-on { display: none; }
+  .sx-sound[aria-pressed="true"] .v-on { display: block; }
+  .sx-sound[aria-pressed="true"] .v-off { display: none; }
+  .sx-now { display: flex; gap: 10px; min-width: 190px; font-size: 12px; white-space: nowrap; }
+  .sx-now-num { color: var(--muted); font-size: 12px; }
+  .sx-now-name { font-size: 12px; }
+  .sx-dots { display: flex; gap: 6px; }
+  .sx-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.25); transition: background .3s, transform .3s; }
+  .sx-dots span.on { background: #fff; transform: scale(1.25); }
+
+  @media (max-width: 809px) {
+    .sx-intro { min-height: calc(100svh - 72px); }
+    .sx-stage { min-height: 150vh; }
+    .sx-row, .sx-row.right { flex-direction: column; align-items: stretch; gap: 36px; }
+    .sx-card { padding: 28px 0; box-shadow: 0 0 60px 40px rgba(0,0,0,.72); }
+    .sx-figure { flex: none; width: 74%; align-self: center; }
+    .sx-hint { font-size: 10.5px; letter-spacing: .1em; }
+    .sx-bar { bottom: 14px; gap: 10px; }
+    .sx-now { min-width: 0; }
+    .sx-now-num, .sx-dots { display: none; }
+    .sx-now-name { font-size: 11px; width: 118px; overflow: hidden; text-overflow: ellipsis; }
+  }
+</style>
+
+<script>
+  type Mix = Record<string, number>;
+  const root = document.querySelector<HTMLElement>(".sx");
+  if (root) {
+    const cfg = JSON.parse(root.dataset.config || "{}");
+    const stems: any[] = cfg.stems ?? [];
+    const stages: any[] = cfg.stages ?? [];
+    const bpm: number = cfg.bpm || 120;
+    const beatDur = 60 / bpm, barDur = beatDur * 4, loopDur = barDur * (cfg.bars || 4);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ids = stems.map((s) => s.id);
+
+    // ───── Scroll position → mix ─────
+    // Each stage reaches its mix 30% into its section and holds it to 80%
+    // (or moves on to its mixEnd by then). Between stages the mixes are blended.
+    const sections = [...root.querySelectorAll<HTMLElement>(".sx-stage")];
+    const keys: { p: number; mix: Mix }[] = [];
+    stages.forEach((s, i) => {
+      keys.push({ p: i + 0.3, mix: s.mix });
+      keys.push({ p: i + 0.8, mix: s.mixEnd ?? s.mix }); // hold (or move to mixEnd), then blend into the next stage
+    });
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    function mixAt(p: number): Mix {
+      if (!keys.length) return {};
+      if (p <= keys[0].p) return keys[0].mix;
+      const last = keys[keys.length - 1];
+      if (p >= last.p) return last.mix;
+      let k = 0;
+      while (keys[k + 1].p < p) k++;
+      const a = keys[k], b = keys[k + 1], t = (p - a.p) / (b.p - a.p);
+      const out: Mix = {};
+      for (const id of [...ids, "filter"]) {
+        const x = a.mix[id] ?? (id === "filter" ? 20000 : 0), y = b.mix[id] ?? (id === "filter" ? 20000 : 0);
+        out[id] = id === "filter" ? Math.exp(lerp(Math.log(x), Math.log(y), t)) : lerp(x, y, t);
+      }
+      return out;
+    }
+    // Continuous stage position: 0 = start of stage 1, 1 = start of stage 2 ...
+    function position(): number {
+      const mid = innerHeight * 0.5;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const r = sections[i].getBoundingClientRect();
+        if (r.top <= mid) return i + Math.min(1, (mid - r.top) / r.height);
+      }
+      return -0.5;
+    }
+
+    // ───── Placeholder loops (used for any stem without a file) ─────
+    function rng(seed: number) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+    // Frequencies snapped so every partial completes whole cycles per loop (no clicks at the loop point).
+    const snap = (f: number) => Math.round(f * loopDur) / loopDur;
+    const hz = (m: number) => snap(440 * Math.pow(2, (m - 69) / 12));
+    function makePlaceholder(ctx: BaseAudioContext, kind: string): AudioBuffer {
+      const sr = ctx.sampleRate, n = Math.round(loopDur * sr);
+      const buf = ctx.createBuffer(1, n, sr), d = buf.getChannelData(0);
+      const rand = rng(kind.length * 977);
+      if (kind === "voice") {
+        // A simple sung-like line (placeholder only, not the real melody).
+        const notes = [[0, 2, 62], [2, 1, 65], [3, 1, 67], [4, 3, 69], [8, 1, 67], [9, 1, 65], [10, 2, 64], [12, 3, 62]];
+        for (const [b, len, m] of notes) {
+          const s0 = Math.round(b * beatDur * sr), dur = len * beatDur, f = hz(m);
+          let ph = 0;
+          for (let i = 0; i < (dur + 0.35) * sr && s0 + i < n; i++) {
+            const t = i / sr;
+            const env = Math.min(1, t / 0.08) * (t < dur ? 1 : Math.exp(-(t - dur) * 12));
+            const vib = t > 0.25 ? 1 + 0.006 * Math.sin(2 * Math.PI * 5.5 * t) : 1;
+            ph += (2 * Math.PI * f * vib) / sr;
+            d[s0 + i] += env * (Math.sin(ph) + 0.35 * Math.sin(2 * ph) + 0.15 * Math.sin(3 * ph) + 0.07 * Math.sin(4 * ph) + 0.02 * (rand() - 0.5));
+          }
+        }
+      } else if (kind === "pad") {
+        const a = [50, 57, 65, 72].map(hz), b = [46, 53, 57, 62].map(hz);
+        for (let i = 0; i < n; i++) {
+          const t = i / sr, w = 0.5 + 0.5 * Math.cos((2 * Math.PI * t) / loopDur);
+          let v = 0;
+          for (let j = 0; j < 4; j++) {
+            v += w * (Math.sin(2 * Math.PI * a[j] * t) + Math.sin(2 * Math.PI * (a[j] + 1 / loopDur * 2) * t));
+            v += (1 - w) * (Math.sin(2 * Math.PI * b[j] * t) + Math.sin(2 * Math.PI * (b[j] + 1 / loopDur * 2) * t));
+          }
+          d[i] = v * (0.8 + 0.2 * Math.sin((4 * Math.PI * t) / loopDur));
+        }
+      } else if (kind === "perc") {
+        const step = beatDur / 4;
+        for (let s = 0; s < n / (step * sr); s++) {
+          const s0 = Math.round(s * step * sr), off = s % 4 === 2, clap = s % 8 === 4;
+          let prev = 0, lp = 0;
+          const decay = clap ? 9 : off ? 28 : 55, amp = clap ? 0.7 : off ? 0.55 : 0.28;
+          for (let i = 0; i < 0.25 * sr && s0 + i < n; i++) {
+            const x = rand() * 2 - 1, env = Math.exp(-(i / sr) * decay);
+            if (clap) { lp += (x - lp) * 0.35; d[s0 + i] += amp * env * lp; }
+            else { d[s0 + i] += amp * env * (x - prev); prev = x; }
+          }
+          if (s % 16 === 7 || s % 16 === 14) { // a low hand-drum tone
+            for (let i = 0; i < 0.2 * sr && s0 + i < n; i++) d[s0 + i] += 0.45 * Math.exp(-(i / sr) * 22) * Math.sin(2 * Math.PI * 190 * (i / sr));
+          }
+        }
+      } else {
+        const bass = [38, 38, 41, 33];
+        for (let b = 0; b < (cfg.bars || 4) * 4; b++) {
+          const s0 = Math.round(b * beatDur * sr);
+          let ph = 0;
+          for (let i = 0; i < 0.45 * sr && s0 + i < n; i++) {
+            const t = i / sr; ph += (2 * Math.PI * (45 + 110 * Math.exp(-t * 30))) / sr;
+            d[s0 + i] += Math.exp(-t * 7) * Math.sin(ph);
+          }
+          const o0 = s0 + Math.round((beatDur / 2) * sr), f = hz(bass[Math.floor(b / 4) % 4]);
+          for (let i = 0; i < beatDur * 0.45 * sr && o0 + i < n; i++) {
+            const t = i / sr; d[o0 + i] += 0.6 * Math.tanh(2.2 * Math.sin(2 * Math.PI * f * t)) * Math.min(1, t / 0.005) * Math.exp(-t * 6);
+          }
+        }
+      }
+      let peak = 0;
+      for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(d[i]));
+      const g = (kind === "voice" ? 0.6 : kind === "pad" ? 0.32 : 0.75) / (peak || 1);
+      for (let i = 0; i < n; i++) d[i] *= g;
+      return buf;
+    }
+
+    // ───── Audio engine ─────
+    let ctx: AudioContext | null = null, master!: GainNode, filter!: BiquadFilterNode;
+    const gains: Record<string, GainNode> = {}, applied: Record<string, number> = {}, pending: Record<string, number> = {};
+    let buffers: AudioBuffer[] = [], sources: AudioBufferSourceNode[] = [], loopStart = 0, appliedFilter = 20000;
+    let soundOn = false, starting: Promise<void> | null = null;
+    ids.forEach((id) => { applied[id] = 0; pending[id] = 0; });
+
+    function ramp(p: AudioParam, v: number, at: number, tau: number) {
+      const now = ctx!.currentTime;
+      if ((p as any).cancelAndHoldAtTime) (p as any).cancelAndHoldAtTime(now);
+      else { p.cancelScheduledValues(now); p.setValueAtTime(p.value, now); }
+      p.setTargetAtTime(v, Math.max(at, now), tau);
+    }
+    function startLoops(at: number) {
+      sources.forEach((s) => { try { s.stop(); } catch {} });
+      sources = stems.map((s, i) => {
+        const src = ctx!.createBufferSource();
+        src.buffer = buffers[i]; src.loop = true; src.connect(gains[s.id]); src.start(at);
+        return src;
+      });
+      loopStart = at;
+    }
+    function initAudio() {
+      if (starting) return starting;
+      starting = (async () => {
+        const AC = window.AudioContext || (window as any).webkitAudioContext;
+        ctx = new AC();
+        master = ctx.createGain(); master.gain.value = 0;
+        filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 20000; filter.Q.value = 0.5;
+        filter.connect(master); master.connect(ctx.destination);
+        stems.forEach((s) => { const g = ctx!.createGain(); g.gain.value = 0; g.connect(filter); gains[s.id] = g; });
+        buffers = await Promise.all(stems.map(async (s) => {
+          if (s.src) {
+            try { const r = await fetch(s.src); return await ctx!.decodeAudioData(await r.arrayBuffer()); } catch {}
+          }
+          return makePlaceholder(ctx!, s.placeholder || "voice");
+        }));
+        startLoops(ctx.currentTime + 0.12);
+      })();
+      return starting;
+    }
+    async function setSound(on: boolean) {
+      soundOn = on;
+      soundBtn.setAttribute("aria-pressed", String(on));
+      soundBtn.setAttribute("aria-label", on ? "Mute" : "Sound on");
+      if (on) {
+        await initAudio();
+        if (ctx!.state === "suspended") await ctx!.resume();
+        applyMix(mixAt(position()));
+        ramp(master.gain, 0.9, 0, 0.25);
+      } else if (ctx) ramp(master.gain, 0, 0, 0.15);
+    }
+    // The mix also follows scroll events directly (animation frames pause in background tabs).
+    addEventListener("scroll", () => applyMix(mixAt(position())), { passive: true });
+    function applyMix(mix: Mix) {
+      if (!ctx || !soundOn) return;
+      const now = ctx.currentTime;
+      for (const s of stems) {
+        const id = s.id, target = Math.max(0, Math.min(1, mix[id] ?? 0)), p = gains[id].gain;
+        if (pending[id]) {
+          if (now < pending[id] && target > 0.02) continue; // already waiting for the next bar
+          pending[id] = 0;
+        }
+        if (Math.abs(target - applied[id]) < 0.01) continue;
+        if (s.quantize && applied[id] <= 0.02 && target > 0.02) {
+          // New rhythm layers come in on the next bar line.
+          const next = loopStart + Math.ceil((now - loopStart + 0.03) / barDur) * barDur;
+          ramp(p, target, next, 0.03);
+          pending[id] = next;
+        } else ramp(p, target, now, 0.35);
+        applied[id] = target;
+      }
+      const f = mix.filter ?? 20000;
+      if (Math.abs(Math.log(f / appliedFilter)) > 0.03) { ramp(filter.frequency, f, now, 0.4); appliedFilter = f; }
+    }
+
+    // ───── Controls ─────
+    const soundBtn = root.querySelector<HTMLButtonElement>(".sx-sound")!;
+    const bar = root.querySelector<HTMLElement>(".sx-bar")!;
+    const nowNum = root.querySelector<HTMLElement>(".sx-now-num")!;
+    const nowName = root.querySelector<HTMLElement>(".sx-now-name")!;
+    const dots = [...root.querySelectorAll<HTMLElement>(".sx-dots span")];
+    const firstStage = sections[0];
+    const go = (el: Element | null) => el && el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+
+    root.querySelector(".sx-enter")!.addEventListener("click", () => { setSound(true); go(firstStage); });
+    root.querySelector(".sx-silent")!.addEventListener("click", () => { setSound(false); go(firstStage); });
+    soundBtn.addEventListener("click", () => setSound(!soundOn));
+    root.querySelector(".sx-restart")!.addEventListener("click", () => {
+      go(firstStage);
+      if (ctx && soundOn) { ramp(master.gain, 0, 0, 0.08); startLoops(ctx.currentTime + 0.3); setTimeout(() => soundOn && ramp(master.gain, 0.9, 0, 0.25), 320); }
+    });
+    root.querySelector(".sx-skip")!.addEventListener("click", () => {
+      const i = Math.floor(position() + 0.0001);
+      go(i + 1 < sections.length ? sections[Math.max(0, i + 1)] : root.querySelector(".sx-outro"));
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (!ctx) return;
+      if (document.hidden) ctx.suspend(); else if (soundOn) ctx.resume();
+    });
+
+    // For checking the mixer from the browser console.
+    (window as any).sxState = () => ({ audio: ctx?.state, soundOn, position: +position().toFixed(2), gains: { ...applied }, waitingForBar: { ...pending } });
+
+    // ───── Visuals ─────
+    const canvas = root.querySelector<HTMLCanvasElement>(".sx-canvas")!;
+    const g2 = canvas.getContext("2d")!;
+    let W = 0, H = 0, dpr = 1;
+    function resize() {
+      dpr = Math.min(2, devicePixelRatio || 1);
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    }
+    addEventListener("resize", resize); resize();
+    const vis: Mix = {}; ids.forEach((id) => (vis[id] = 0));
+    const patterns = [
+      [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,1,0,0],
+      [1,0,1,0, 0,1,0,0, 1,0,1,0, 0,0,1,1],
+    ];
+    const words = `${cfg.title || ""} · فيروز · `;
+
+    function arch(cx: number, base: number, r: number, h: number) {
+      g2.beginPath(); g2.moveTo(cx - r, base); g2.lineTo(cx - r, base - h);
+      g2.arc(cx, base - h, r, Math.PI, 0); g2.lineTo(cx + r, base); g2.stroke();
+    }
+    let lastStage = -2;
+    function frame(ms: number) {
+      const p = position(), mix = mixAt(p);
+      applyMix(mix);
+      // stage indicator
+      const si = Math.max(0, Math.min(stages.length - 1, Math.floor(p)));
+      if (si !== lastStage) {
+        lastStage = si;
+        nowNum.textContent = String(si + 1).padStart(2, "0");
+        nowName.textContent = stages[si]?.label ?? "";
+        dots.forEach((d, i) => d.classList.toggle("on", i === si));
+      }
+      bar.classList.toggle("is-hidden", p < -0.2 || root!.querySelector(".sx-outro")!.getBoundingClientRect().top < innerHeight * 0.5);
+
+      for (const id of ids) vis[id] += ((mix[id] ?? 0) - vis[id]) * (reduce ? 1 : 0.06);
+      const v = vis.voice ?? 0, a = vis.pad ?? 0, r = vis.perc ?? 0, k = vis.kick ?? 0;
+      const t = reduce ? 0 : ctx && soundOn ? ctx.currentTime - loopStart : ms / 1000;
+      const beat = t / beatDur, ph = ((beat % 1) + 1) % 1;
+      const pulse = reduce ? 0 : Math.exp(-ph * 7) * k;
+      const evo = Math.max(0, Math.min(1, p - (stages.length - 1)));
+
+      g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g2.clearRect(0, 0, W, H);
+      const m = Math.min(W, H), cx = W / 2;
+
+      // Typography turning into rhythm: rows of text, denser as the beat builds.
+      const dens = Math.max(r * 0.6, k);
+      if (dens > 0.01) {
+        const size = Math.max(28, m * 0.07), rows = Math.ceil(H / (size * 1.15)) + 1;
+        g2.font = `500 ${size}px Oswald, sans-serif`; g2.textBaseline = "top";
+        const tw = g2.measureText(words).width || 1;
+        for (let row = 0; row < rows; row++) {
+          const on = row % 2 === 0 || dens > 0.6;
+          if (!on) continue;
+          const dir = row % 2 ? 1 : -1, speed = 18 + (row % 3) * 10;
+          const off = (((dir * t * speed + row * 140) % tw) + tw) % tw;
+          g2.fillStyle = `rgba(255,255,255,${(0.035 + 0.05 * dens + 0.05 * pulse * (row % 2 ? 0 : 1)) * dens})`;
+          for (let x = -off; x < W; x += tw) g2.fillText(words, x, row * size * 1.15);
+        }
+      }
+
+      // Atmosphere: arches growing out of the floor, breathing slowly.
+      if (a > 0.01) {
+        const base = H * 0.86;
+        for (let j = 0; j < 7; j++) {
+          const rad = m * (0.14 + j * 0.075) * (1 + 0.015 * Math.sin(t * 0.6 + j)) + pulse * 6;
+          g2.strokeStyle = `rgba(255,255,255,${a * Math.max(0, 0.32 - j * 0.04)})`;
+          g2.lineWidth = 1;
+          arch(cx, base, rad, rad * 0.55);
+        }
+      }
+
+      // The source: a melodic line across the screen.
+      if (v > 0.01) {
+        const mid = H * 0.5, amp = H * 0.05 * v;
+        for (let L = 0; L < 2; L++) {
+          g2.beginPath();
+          for (let x = 0; x <= W; x += 6) {
+            const u = x / W;
+            const y = mid + amp * (Math.sin(u * 9 + t * 1.3 + L) * 0.6 + Math.sin(u * 23 - t * 0.9) * 0.3 + Math.sin(u * 3 + t * 0.4) * 0.5) * Math.sin(Math.PI * u);
+            x ? g2.lineTo(x, y) : g2.moveTo(x, y);
+          }
+          g2.strokeStyle = `rgba(255,255,255,${(L ? 0.18 : 0.55) * v})`;
+          g2.lineWidth = L ? 1 : 1.4;
+          g2.stroke();
+        }
+      }
+
+      // Rhythm: a 16-step row; the evolution stage shifts the pattern every bar.
+      if (r > 0.01 || k > 0.01) {
+        const n = 16, gx = Math.max(24, W * 0.06), cw = (W - gx * 2) / n, y = H * 0.93, s = Math.min(cw * 0.55, 14);
+        const barIx = Math.floor(beat / 4), stepIx = Math.floor(beat * 4) % n;
+        const pat = patterns[evo > 0.1 ? barIx % 2 : 0], shift = evo > 0.1 ? barIx % 4 : 0;
+        for (let i = 0; i < n; i++) {
+          const hit = pat[(i + shift) % n] || i % 4 === 0;
+          const cur = !reduce && i === stepIx;
+          g2.fillStyle = `rgba(255,255,255,${Math.max(r, k) * (cur ? 1 : hit ? 0.45 : 0.1)})`;
+          const x = gx + i * cw + (cw - s) / 2;
+          if (i % 4 === 0) g2.fillRect(x, y - s / 2, s, s); else { g2.beginPath(); g2.arc(x + s / 2, y, s / 3, 0, Math.PI * 2); g2.fill(); }
+        }
+      }
+
+      // Kick: a thin horizontal pulse.
+      if (pulse > 0.02) {
+        g2.fillStyle = `rgba(255,255,255,${0.25 * pulse})`;
+        g2.fillRect(0, H * 0.5 - 0.5, W, 1);
+      }
+      if (!reduce || ms === 0) requestAnimationFrame(frame);
+    }
+    if (reduce) {
+      // Draw on scroll only: no constant animation.
+      const draw = () => frame(0);
+      addEventListener("scroll", draw, { passive: true }); draw();
+    } else requestAnimationFrame(frame);
+  }
+</script>
